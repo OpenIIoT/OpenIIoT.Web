@@ -1,6 +1,0 @@
-C:\Users\JP.WHATNET\Desktop\Projects\Symbiote.Web\Trend\bin\Trend.dll.config
-C:\Users\JP.WHATNET\Desktop\Projects\Symbiote.Web\Trend\bin\Trend.dll
-C:\Users\JP.WHATNET\Desktop\Projects\Symbiote.Web\Trend\bin\Trend.pdb
-C:\Users\JP.WHATNET\Desktop\Projects\Symbiote.Web\Trend\obj\Debug\Trend.csprojResolveAssemblyReference.cache
-C:\Users\JP.WHATNET\Desktop\Projects\Symbiote.Web\Trend\obj\Debug\Trend.dll
-C:\Users\JP.WHATNET\Desktop\Projects\Symbiote.Web\Trend\obj\Debug\Trend.pdb

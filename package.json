@@ -1,15 +1,15 @@
 {
-  "name": "admin-lte",
-  "version": "2.4.0",
+  "name": "OpenIIoT.Web",
+  "version": "0.5.0",
   "main": "index.js",
   "scripts": {
     "test": ""
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/almasaeed2010/AdminLTE.git"
+    "url": "git://github.com/OpenIIoT/OpenIIoT.Web.git"
   },
-  "license": "MIT",
+  "license": "AGPLv3",
   "devDependencies": {
     "R2": "^1.4.3",
     "express": "^4.15.4",

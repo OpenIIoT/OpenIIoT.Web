@@ -459,7 +459,7 @@ a:focus {
 .user-panel {
   position: relative;
   width: 100%;
-  padding: 10px;
+  padding: 10px 10px 0px 10px;
   overflow: hidden;
 }
 .user-panel:before,
@@ -476,15 +476,29 @@ a:focus {
   height: auto;
 }
 .user-panel > .info {
-  padding: 5px 5px 5px 15px;
+  padding: 5px 5px 0px 10px;
   line-height: 1;
-  position: absolute;
+  /*position: absolute;*/
   left: 55px;
 }
 .user-panel > .info > p {
   font-weight: 600;
   margin-bottom: 9px;
 }
+.versioninfo {
+  font-size: 11px;
+}
+#version{
+  margin-left: 5px;
+}
+#instancename {
+  font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 150px;
+  text-overflow: ellipsis;
+}
+
 .user-panel > .info > a {
   text-decoration: none;
   padding-right: 5px;

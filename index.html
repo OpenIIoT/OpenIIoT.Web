@@ -126,23 +126,32 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <section class="sidebar">
         <!-- Sidebar Menu -->
         <ul class="sidebar-menu" data-widget="tree">
+          <!--<li class="header">STATUS</li>-->
             <div class="user-panel">
                 <div class="pull-left image">
                     <img src="assets/img/ok.png" class="img-circle" alt="User Image">
                 </div>
                 <div class="pull-left info">
                     <p id="instancename">SE-FL-02</p>
-                    <p class="versioninfo"><i class="fa fa-info"></i> <span id="version">OpenIIoT 0.5.0.21412</span></p>
+                    <p id="version">OpenIIoT 0.5.0.21412</p>
                 </div>
             </div>
-            <li class="header">STATUS</li>
         <li><a href="#"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
-        <li><a href="#"><i class="fa fa-book"></i> <span>Logs</span></a></li>
-        <li class="header">SECURITY</li>
-        <!-- Optionally, you can add icons to the links -->
-        <li class="active"><a href="#"><i class="fa fa-users"></i> <span>Users</span></a></li>
-        <li><a href="#"><i class="fa fa-key"></i> <span>Api Keys</span></a></li>
-        <li><a href="#"><i class="fa fa-list"></i> <span>Sessions</span></a></li>
+        <li class="active"><a href="#"><i class="fa fa-cog"></i> <span>Configuration</span></a></li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-lock"></i>
+            <span>Security</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-right pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="active"><a href="#"><i class="fa fa-users"></i> <span>Users</span></a></li>
+            <li><a href="#"><i class="fa fa-key"></i> <span>Api Keys</span></a></li>
+          </ul>
+        <li><a href="#"><i class="fa fa-archive"></i> <span>Packages</span></a></li>
+
         <li class="header">DEMOS</li>
         <li><a href="#"><i class="fa fa-camera"></i> <span>Image</span></a></li>
         <li><a href="#"><i class="fa fa-line-chart"></i> <span>Sine Wave</span></a></li>

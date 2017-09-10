@@ -9,7 +9,7 @@
     "type": "git",
     "url": "git://github.com/OpenIIoT/OpenIIoT.Web.git"
   },
-  "license": "AGPLv3",
+  "license": "AGPL-3.0",
   "devDependencies": {
     "R2": "^1.4.3",
     "express": "^4.15.4",

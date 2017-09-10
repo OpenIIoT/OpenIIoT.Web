@@ -9,6 +9,18 @@
  * Core: General Layout Style
  * -------------------------
  */
+#version {
+  font-size: 11px;
+  margin-left: 0px;
+}
+#instancename {
+  font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 150px;
+  text-overflow: ellipsis;
+}
+
 html,
 body {
   height: 100%;
@@ -485,20 +497,6 @@ a:focus {
   font-weight: 600;
   margin-bottom: 9px;
 }
-.versioninfo {
-  font-size: 11px;
-}
-#version{
-  margin-left: 5px;
-}
-#instancename {
-  font-size: 18px;
-  white-space: nowrap;
-  overflow: hidden;
-  max-width: 150px;
-  text-overflow: ellipsis;
-}
-
 .user-panel > .info > a {
   text-decoration: none;
   padding-right: 5px;
@@ -541,6 +539,8 @@ a:focus {
   font-size: 12px;
 }
 .sidebar-menu li > a > .fa-angle-left,
+.sidebar-menu li > a > .fa-angle-right,
+.sidebar-menu li > a > .pull-right-container > .fa-angle-right,
 .sidebar-menu li > a > .pull-right-container > .fa-angle-left {
   width: auto;
   height: auto;
@@ -562,6 +562,13 @@ a:focus {
   -ms-transform: rotate(-90deg);
   -o-transform: rotate(-90deg);
   transform: rotate(-90deg);
+}
+.sidebar-menu .menu-open > a > .fa-angle-right,
+.sidebar-menu .menu-open > a > .pull-right-container > .fa-angle-right {
+  -webkit-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 .sidebar-menu .active > .treeview-menu {
   display: block;

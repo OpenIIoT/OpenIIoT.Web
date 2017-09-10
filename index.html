@@ -255,18 +255,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <!-- AdminLTE App -->
 <script src="assets/js/adminlte.min.js"></script>
 <script src="node_modules/jquery.cookie/jquery.cookie.js"></script>
+<script src="node_modules/fastclick/lib/fastclick.js"></script>
+<script src="node_modules/jquery-slimscroll/jquery.slimscro..js"></script>
 
 <script type="text/javascript">
-  $('#dashboard').click(function() { navigate('dashboard', 'pages/dashboard.html'); });
-  $('#configuration').click(function() { navigate('configuration', 'pages/configuration.html'); });
-  $('#security').click(function() { navigate('security', 'pages/security.html'); });
-  $('#packages').click(function() { navigate('packages', 'pages/packages.html'); });
-  $('#demo-image').click(function() { navigate('demo-image', 'pages/demo-image.html'); });
-  $('#demo-sinewave').click(function() { navigate('demo-sinewave', 'pages/demo-sinewave.html'); });
-  $('#demo-readwrite').click(function() { navigate('demo-readwrite', 'pages/demo-readwrite.html'); });
   var active;
 
   $(document).ready(function() {
+    $('#dashboard').click(function() { navigate('dashboard', 'pages/dashboard.html'); });
+    $('#configuration').click(function() { navigate('configuration', 'pages/configuration.html'); });
+    $('#security').click(function() { navigate('security', 'pages/security.html'); });
+    $('#packages').click(function() { navigate('packages', 'pages/packages.html'); });
+    $('#demo-image').click(function() { navigate('demo-image', 'pages/demo-image.html'); });
+    $('#demo-sinewave').click(function() { navigate('demo-sinewave', 'pages/demo-sinewave.html'); });
+    $('#demo-readwrite').click(function() { navigate('demo-readwrite', 'pages/demo-readwrite.html'); });
+    
     $("#username").text("jp");
 
     active = $.cookie("Active-Page");
@@ -285,7 +288,34 @@ scratch. This page gets rid of all links and provides the needed markup only.
     active = id;
     $.cookie("Active-Page", active);
 
-    $("#content").load(url);
+    $.get(url, function(response, status, jqXHR) {
+      if (response.substring(0,14) == "<!-- login -->") {
+        window.location.href = "../login/";
+      }
+      else {
+        $("#content").html(response);
+      }
+    });
+  }
+
+  function getPage(url) {
+    var pageData;
+    $.ajax({
+      type: "GET",
+      url: url,
+      success: function(data, textStatus) {
+          if (data.redirect) {
+              // data.redirect contains the string URL to redirect to
+              window.location.href = data.redirect;
+          }
+          else {
+              // data.form contains the HTML for the replacement form
+              pageData = data;
+          }
+      }
+    });
+
+    return pageData;
   }
 </script>
 

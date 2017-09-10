@@ -136,26 +136,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <p id="version">OpenIIoT 0.5.0.21412</p>
                 </div>
             </div>
-        <li><a href="#"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
-        <li class="active"><a href="#"><i class="fa fa-cog"></i> <span>Configuration</span></a></li>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-lock"></i>
-            <span>Security</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-right pull-right"></i>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-            <li class="active"><a href="#"><i class="fa fa-users"></i> <span>Users</span></a></li>
-            <li><a href="#"><i class="fa fa-key"></i> <span>Api Keys</span></a></li>
-          </ul>
-        <li><a href="#"><i class="fa fa-archive"></i> <span>Packages</span></a></li>
+        <li class="header">ADMINISTRATION</li>
+        <li id="dashboard"><a href="#"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li id="configuration"><a href="#"><i class="fa fa-wrench"></i> <span>Configuration</span></a></li>
+        <li id="security"><a href="#"><i class="fa fa-lock"></i> <span>Security</span></a></li>
+        <li id="packages"><a href="#"><i class="fa fa-archive"></i> <span>Packages</span></a></li>
 
-        <li class="header">DEMOS</li>
-        <li><a href="#"><i class="fa fa-camera"></i> <span>Image</span></a></li>
-        <li><a href="#"><i class="fa fa-line-chart"></i> <span>Sine Wave</span></a></li>
-        <li><a href="#"><i class="fa fa-exchange"></i> <span>Read/Write</span></a></li>
+        <li class="header">APPS</li>
+        <li id="demo-image"><a href="#"><i class="fa fa-camera"></i> <span>Image</span></a></li>
+        <li id="demo-sinewave"><a href="#"><i class="fa fa-line-chart"></i> <span>Sine Wave</span></a></li>
+        <li id="demo-readwrite"><a href="#"><i class="fa fa-exchange"></i> <span>Read/Write</span></a></li>
       </ul>
       <!-- /.sidebar-menu -->
     </section>
@@ -264,11 +254,39 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- AdminLTE App -->
 <script src="assets/js/adminlte.min.js"></script>
+<script src="node_modules/jquery.cookie/jquery.cookie.js"></script>
 
 <script type="text/javascript">
+  $('#dashboard').click(function() { navigate('dashboard', 'pages/dashboard.html'); });
+  $('#configuration').click(function() { navigate('configuration', 'pages/configuration.html'); });
+  $('#security').click(function() { navigate('security', 'pages/security.html'); });
+  $('#packages').click(function() { navigate('packages', 'pages/packages.html'); });
+  $('#demo-image').click(function() { navigate('demo-image', 'pages/demo-image.html'); });
+  $('#demo-sinewave').click(function() { navigate('demo-sinewave', 'pages/demo-sinewave.html'); });
+  $('#demo-readwrite').click(function() { navigate('demo-readwrite', 'pages/demo-readwrite.html'); });
+  var active;
+
   $(document).ready(function() {
     $("#username").text("jp");
+
+    active = $.cookie("Active-Page");
+
+    if (active) {
+      $("#" + active).click();
+    }
+    else{
+      $("#dashboard").click();
+    }
   });
+
+  function navigate(id, url) {
+    $("#" + active).removeClass("active");
+    $("#" + id).addClass("active");
+    active = id;
+    $.cookie("Active-Page", active);
+
+    $("#content").load(url);
+  }
 </script>
 
 <!-- Optionally, you can add Slimscroll and FastClick plugins.

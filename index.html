@@ -290,7 +290,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     $.get(url, function(response, status, jqXHR) {
       if (response.substring(0,14) == "<!-- login -->") {
-        window.location.href = "../login/";
+        window.location.href = "login";
       }
       else {
         $("#content").html(response);

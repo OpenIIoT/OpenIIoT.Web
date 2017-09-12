@@ -132,7 +132,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <img src="assets/img/ok.png" class="img-circle" alt="User Image">
                 </div>
                 <div class="pull-left info">
-                    <p id="instancename">SE-FL-02</p>
+                    <p id="instancename">DEMO-001</p>
                     <p id="version">OpenIIoT 0.5.0.21412</p>
                 </div>
             </div>
@@ -143,7 +143,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <li id="packages"><a href="#"><i class="fa fa-archive"></i> <span>Packages</span></a></li>
 
         <li class="header">APPS</li>
-        <li id="demo-image"><a href="#"><i class="fa fa-camera"></i> <span>Image</span></a></li>
+        <li id="demo-clock"><a href="#"><i class="fa fa-clock-o"></i> <span>Clock</span></a></li>
+        <li id="demo-image"><a href="#"><i class="fa fa-image"></i> <span>Image</span></a></li>
         <li id="demo-sinewave"><a href="#"><i class="fa fa-line-chart"></i> <span>Sine Wave</span></a></li>
         <li id="demo-readwrite"><a href="#"><i class="fa fa-exchange"></i> <span>Read/Write</span></a></li>
       </ul>
@@ -256,7 +257,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="assets/js/adminlte.min.js"></script>
 <script src="node_modules/jquery.cookie/jquery.cookie.js"></script>
 <script src="node_modules/fastclick/lib/fastclick.js"></script>
-<script src="node_modules/jquery-slimscroll/jquery.slimscro..js"></script>
+<script src="node_modules/jquery-slimscroll/jquery.slimscroll.js"></script>
+<script src="node_modules/signalr/jquery.signalR.js"></script>
+<script src="signalr/hubs"></script>
 
 <script type="text/javascript">
   var active;
@@ -266,6 +269,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     $('#configuration').click(function() { navigate('configuration', 'pages/configuration.html'); });
     $('#security').click(function() { navigate('security', 'pages/security.html'); });
     $('#packages').click(function() { navigate('packages', 'pages/packages.html'); });
+    $('#demo-clock').click(function() { navigate('demo-clock', 'pages/demo-clock.html'); });
     $('#demo-image').click(function() { navigate('demo-image', 'pages/demo-image.html'); });
     $('#demo-sinewave').click(function() { navigate('demo-sinewave', 'pages/demo-sinewave.html'); });
     $('#demo-readwrite').click(function() { navigate('demo-readwrite', 'pages/demo-readwrite.html'); });
@@ -290,9 +294,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     $.get(url, function(response, status, jqXHR) {
       if (response.substring(0,14) == "<!-- login -->") {
-        window.location.href = "../login/";
+        window.location.href = "login";
       }
       else {
+        
         $("#content").html(response);
       }
     });
@@ -318,9 +323,5 @@ scratch. This page gets rid of all links and provides the needed markup only.
     return pageData;
   }
 </script>
-
-<!-- Optionally, you can add Slimscroll and FastClick plugins.
-     Both of these plugins are recommended to enhance the
-     user experience. -->
 </body>
 </html>

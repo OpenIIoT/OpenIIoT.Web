@@ -1,7 +1,7 @@
 ﻿<section class="content-header">
     <h1>
-        Demo - Image
-        <small>Demonstrates the ability to transport arbitrary data, in this case an image.</small>
+        Demo - Clock
+        <small>Demonstrates the update rate.</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
@@ -15,7 +15,7 @@
         <span class="info-box-icon"><i class="ion ion-ios-pricetag-outline"></i></span>
 
         <div class="info-box-content">
-            <span id="fqn" class="info-box-number" style="font-size: 24px">OpenIIoT.Simulation.Binary.DynamicImage</span>
+            <span id="fqn" class="info-box-number" style="font-size: 24px">OpenIIoT.Simulation.DateTime.Time</span>
             <span id="timestamp" class="info-box-number" style="font-weight: 400; font-size: 16px"></span>
             <span id="quality" class="info-box-number" style="font-weight: 400; font-size: 16px"></span>
         </div>
@@ -34,11 +34,11 @@
 
     <div class="box box-primary">
         <div class="box-header with-border">
-            <i class="fa fa-image"></i>
-            <h3 class="box-title">Image</h3>
+            <i class="fa fa-clock-o"></i>
+            <h3 class="box-title">Clock</h3>
         </div>
-        <div class="box-body text-center">
-            <img id="image" src="">
+        <div id="clock" class="box-body text-center" style="font-size: 64px">
+            00:00:00.000
         </div>
     </div>
 </section>
@@ -73,9 +73,9 @@
         var proxy = connection.createHubProxy(hubName);
 
         proxy.on('read', function (fqn, item) {
-            var src = 'data:image/gif;base64,' + JSON.parse(item)
+            var time = JSON.parse(item)
 
-            $("#image").attr("src", src);
+            $("#clock").text(time);
 
             var fqnobj = JSON.parse(fqn);
             $("#timestamp").text("Timestamp: " + fqnobj.Timestamp);

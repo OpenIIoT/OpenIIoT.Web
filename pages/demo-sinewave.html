@@ -1,21 +1,215 @@
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-            <h1>
-              Demo - Sine Wave
-              <small>Optional description</small>
-            </h1>
-            <ol class="breadcrumb">
-              <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-              <li class="active">Here</li>
-            </ol>
-          </section>
-      
-          <!-- Main content -->
-          <section class="content container-fluid">
-      
-            <!--------------------------
-              | Your Page Content Here |
-              -------------------------->
-      
-    </section>
-    <!-- /.content -->
+<section class="content-header">
+  <h1>
+    Demo - Sine Wave
+    <small>Demonstrates the update rate.</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+    <li class="active">Here</li>
+  </ol>
+</section>
+
+<section class="content container-fluid">
+
+  <div id="info" class="info-box bg-aqua">
+    <span class="info-box-icon"><i class="ion ion-ios-pricetag"></i></span>
+
+    <div class="info-box-content">
+      <span id="fqn" class="info-box-number" style="font-size: 24px">OpenIIoT.Simulation.Math.Trig</span>
+      <span id="timestamp" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Timestamp: N/A</span>
+      <span id="quality" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Quality: N/A</span>
+      <button type="button" class="btn btn-lg pull-right bg-aqua" style="margin-top: -43px; margin-right: -4px;" id="subscription"
+        onclick="toggleSubscription()"><i id="subscription-icon" class="fa fa-refresh"></i></button>
+    </div>
+  </div>
+
+  <div class="box box-primary">
+    <div class="box-header with-border">
+      <i class="fa fa-clock-o"></i>
+      <h3 class="box-title">Sine Wave</h3>
+    </div>
+    <div id="clock" class="box-body text-center" style="font-size: 64px">
+      00:00:00.000
+    </div>
+  </div>
+
+  <div class="box box-primary">
+    <div class="box-header with-border">
+      <i class="fa fa-bar-chart-o"></i>
+
+      <h3 class="box-title">Interactive Area Chart</h3>
+
+      <div class="box-tools pull-right">
+        Real time
+        <div class="btn-group" id="realtime" data-toggle="btn-toggle">
+          <button type="button" class="btn btn-default btn-xs active" data-toggle="on">On</button>
+          <button type="button" class="btn btn-default btn-xs" data-toggle="off">Off</button>
+        </div>
+      </div>
+    </div>
+    <div class="box-body">
+      <div id="interactive" style="height: 300px;"></div>
+    </div>
+  </div>
+
+</section>
+
+
+
+
+<script type="text/javascript">
+  var chat;
+  var subscribed = false;
+  var data = [];
+
+  $(document).ready(function () {
+    console.log('trying to connect to service');
+    chat = HubProxyFactory('signalr', 'ItemHub');
+    console.log('connected to service');
+  });
+
+  function subscribe(fqn) {
+    chat.invoke('subscribe', $("#fqn").text())
+  }
+
+  function unsubscribe(fqn) {
+    chat.invoke('unsubscribe', $("#fqn").text())
+  }
+
+  function toggleSubscription(fqn) {
+    if (subscribed) {
+      unsubscribe(fqn);
+    } else {
+      subscribe(fqn);
+    }
+  }
+
+  function write(fqn, value) {
+    chat.invoke('write', [$("fqn"), $("#value").val()]);
+  }
+
+  function HubProxyFactory(serverUrl, hubName) {
+    console.log("creating hub proxy");
+
+    var connection = $.hubConnection(serverUrl);
+    var proxy = connection.createHubProxy(hubName);
+
+    var interactive_plot = $.plot('#interactive', [getRandomData()], {
+    grid: {
+      borderColor: '#f3f3f3',
+      borderWidth: 1,
+      tickColor: '#f3f3f3'
+    },
+    series: {
+      shadowSize: 0, // Drawing is faster without shadows
+      color: '#3c8dbc'
+    },
+    lines: {
+      fill: false, //Converts the line chart to area chart
+      color: '#3c8dbc'
+    },
+    yaxis: {
+      min: -1,
+      max: 1,
+      show: true
+    },
+    xaxis: {
+      show: true
+    }
+  })
+
+  var updateInterval = 250 //Fetch data ever x milliseconds
+  var realtime = 'on' //If == to on then fetch data every x seconds. else stop fetching
+
+    proxy.on('read', function (fqn, item) {
+      var time = JSON.parse(item)
+
+      $("#clock").text(time[1]);
+      data.push(time[1]);
+
+      if (data.length > 30) {
+        data.shift();
+      }
+
+      interactive_plot.setData(data);
+      interactive_plot.draw();
+
+      var fqnobj = JSON.parse(fqn);
+      $("#timestamp").text("Timestamp: " + fqnobj.Timestamp);
+      $("#quality").text("Quality: " + fqnobj.Quality);
+    });
+
+    proxy.on('subscribeSuccess', function (fqn) {
+      subscribed = true;
+      $("#info").removeClass("bg-aqua").addClass("bg-green");
+      $("#subscription").removeClass("bg-aqua").addClass("bg-green");
+      $("#subscription-icon").removeClass("fa-refresh").addClass("fa-pause");
+    })
+
+    proxy.on('unsubscribeSuccess', function (fqn) {
+      subscribed = false;
+      $("#info").removeClass("bg-green").addClass("bg-aqua");
+      $("#subscription").removeClass("bg-green").addClass("bg-aqua");
+      $("#subscription-icon").removeClass("fa-pause").addClass("fa-refresh");
+    })
+
+    connection.start().done(function () {
+      console.log("signalr started");
+      //subscribe();
+    });
+
+    console.log("proxy created");
+    return proxy;
+  }
+
+  /*
+   * Flot Interactive Chart
+   * -----------------------
+   */
+  // We use an inline data source in the example, usually data would
+  // be fetched from a server
+  //var data = []
+  //var totalPoints = 100
+
+  function getRandomData() {
+    /* 
+        if (data.length > 0)
+          data = data.slice(1)
+
+        // Do a random walk
+        while (data.length < totalPoints) {
+
+          var prev = data.length > 0 ? data[data.length - 1] : 50,
+            y = prev + Math.random() * 10 - 5
+
+          if (y < 0) {
+            y = 0
+          } else if (y > 100) {
+            y = 100
+          }
+
+          data.push(y)
+        }
+
+        // Zip the generated y values with the x values
+        var res = []
+        for (var i = 0; i < data.length; ++i) {
+          res.push([i, data[i]])
+        }
+
+        return res */
+    return data;
+  }
+
+
+
+
+
+  function update() {
+    if (subscribed) {
+      console.log(data);
+
+      setTimeout(update, updateInterval);
+    }
+  }
+</script>

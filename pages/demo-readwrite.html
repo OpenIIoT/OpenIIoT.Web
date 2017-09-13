@@ -1,8 +1,7 @@
-<!-- Content Header (Page header) -->
 <section class="content-header">
   <h1>
-    Demo - Read/Write
-    <small>Optional description</small>
+    Demo - Clock
+    <small>Demonstrates the update rate.</small>
   </h1>
   <ol class="breadcrumb">
     <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
@@ -10,12 +9,135 @@
   </ol>
 </section>
 
-<!-- Main content -->
 <section class="content container-fluid">
 
-  <!--------------------------
-              | Your Page Content Here |
-              -------------------------->
+  <div id="info" class="info-box bg-aqua">
+    <span class="info-box-icon"><i class="ion ion-ios-pricetag"></i></span>
+
+    <div class="info-box-content">
+      <span id="fqn" class="info-box-number" style="font-size: 24px">OpenIIoT.Simulation.ReadWrite.Read</span>
+      <span id="timestamp" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Timestamp: N/A</span>
+      <span id="quality" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Quality: N/A</span>
+      <button type="button" class="btn btn-lg pull-right bg-aqua" style="margin-top: -43px; margin-right: -4px;" id="subscription"
+        onclick="toggleSubscription()"><i id="subscription-icon" class="fa fa-refresh"></i></button>
+    </div>
+  </div>
+
+  <div class="box box-primary">
+    <div class="box-header with-border">
+      <i class="fa fa-clock-o"></i>
+      <h3 class="box-title">Read</h3>
+    </div>
+    <div id="clock" class="box-body text-center info-box-text" style="font-size: 42px">
+      { max, min }
+    </div>
+  </div>
+
+  <div id="info" class="info-box bg-aqua">
+      <span class="info-box-icon"><i class="ion ion-ios-pricetag"></i></span>
+  
+      <div class="info-box-content">
+        <span id="fqn" class="info-box-number" style="font-size: 24px">OpenIIoT.Simulation.ReadWrite.Write</span>
+        <span id="timestamp" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Timestamp: N/A</span>
+        <span id="quality" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Quality: N/A</span>
+        <button type="button" class="btn btn-lg pull-right bg-aqua" style="margin-top: -43px; margin-right: -4px;" id="subscription"
+          onclick="toggleSubscription()"><i id="subscription-icon" class="fa fa-refresh"></i></button>
+      </div>
+    </div>
+
+  <div class="box box-primary">
+    <div class="box-header with-border">
+      <i class="fa fa-clock-o"></i>
+      <h3 class="box-title">Write</h3>
+    </div>
+    <div class="row margin">
+    <div class="text-center box-body">
+      <input type="text" value="" class="slider form-control" data-slider-min="-200"
+        data-slider-max="200" data-slider-step="5" data-slider-value="[-100,100]" data-slider-orientation="horizontal" data-slider-selection="before"
+        data-slider-tooltip="show" data-slider-id="blue">
+    </div>
+    </div>
+  </div>
 
 </section>
-<!-- /.content -->
+
+
+
+
+<script type="text/javascript">
+  var chat;
+  var subscribed;
+
+  $(document).ready(function () {
+    console.log('trying to connect to service');
+    chat = HubProxyFactory('signalr', 'ItemHub');
+    console.log('connected to service');
+
+    $('.slider').slider();
+
+    $('#ex1').slider({
+      formatter: function (value) {
+        return 'Current value: ' + value;
+      }
+    });
+  });
+
+  function subscribe(fqn) {
+    chat.invoke('subscribe', $("#fqn").text())
+  }
+
+  function unsubscribe(fqn) {
+    chat.invoke('unsubscribe', $("#fqn").text())
+  }
+
+  function toggleSubscription(fqn) {
+    if (subscribed) {
+      unsubscribe(fqn);
+    } else {
+      subscribe(fqn);
+    }
+  }
+
+  function write(fqn, value) {
+    chat.invoke('write', [$("fqn"), $("#value").val()]);
+  }
+
+  function HubProxyFactory(serverUrl, hubName) {
+    console.log("creating hub proxy");
+
+    var connection = $.hubConnection(serverUrl);
+    var proxy = connection.createHubProxy(hubName);
+
+    proxy.on('read', function (fqn, item) {
+      var time = JSON.parse(item)
+
+      $("#clock").text(time);
+
+      var fqnobj = JSON.parse(fqn);
+      $("#timestamp").text("Timestamp: " + fqnobj.Timestamp);
+      $("#quality").text("Quality: " + fqnobj.Quality);
+    });
+
+    proxy.on('subscribeSuccess', function (fqn) {
+      subscribed = true;
+      $("#info").removeClass("bg-aqua").addClass("bg-green");
+      $("#subscription").removeClass("bg-aqua").addClass("bg-green");
+      $("#subscription-icon").removeClass("fa-refresh").addClass("fa-pause");
+    })
+
+    proxy.on('unsubscribeSuccess', function (fqn) {
+      subscribed = false;
+      $("#info").removeClass("bg-green").addClass("bg-aqua");
+      $("#subscription").removeClass("bg-green").addClass("bg-aqua");
+      $("#subscription-icon").removeClass("fa-pause").addClass("fa-refresh");
+    })
+
+    connection.start().done(function () {
+      console.log("signalr started");
+      //subscribe();
+    });
+
+    console.log("proxy created");
+    return proxy;
+  }
+</script>

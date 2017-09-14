@@ -44,6 +44,10 @@
         console.log('connected to service');
     });
 
+    function readFromSource(fqn){
+        chat.invoke('readfromsource', $("#fqn").text());
+    }
+
     function subscribe(fqn) {
         chat.invoke('subscribe', $("#fqn").text())
     }
@@ -85,6 +89,8 @@
             $("#info").removeClass("bg-yellow").addClass("bg-green");
             $("#subscription").removeClass("bg-yellow").addClass("bg-green");
             $("#subscription-icon").removeClass("fa-refresh").addClass("fa-pause");
+
+            readFromSource();
         })
 
         proxy.on('unsubscribeSuccess', function (fqn) {

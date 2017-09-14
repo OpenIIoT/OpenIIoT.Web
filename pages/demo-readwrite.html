@@ -11,15 +11,15 @@
 
 <section class="content container-fluid">
 
-  <div id="info" class="info-box bg-aqua">
+  <div id="readinfo" class="info-box bg-yellow">
     <span class="info-box-icon"><i class="ion ion-ios-pricetag"></i></span>
 
     <div class="info-box-content">
-      <span id="fqn" class="info-box-number" style="font-size: 24px">OpenIIoT.Simulation.ReadWrite.Read</span>
-      <span id="timestamp" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Timestamp: N/A</span>
-      <span id="quality" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Quality: N/A</span>
-      <button type="button" class="btn btn-lg pull-right bg-aqua" style="margin-top: -43px; margin-right: -4px;" id="subscription"
-        onclick="toggleSubscription()"><i id="subscription-icon" class="fa fa-refresh"></i></button>
+      <span id="readfqn" class="info-box-number" style="font-size: 24px">OpenIIoT.Simulation.ReadWrite.Read</span>
+      <span id="readtimestamp" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Timestamp: N/A</span>
+      <span id="readquality" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Quality: N/A</span>
+      <button type="button" class="btn btn-lg pull-right bg-yellow" style="margin-top: -43px; margin-right: -4px;" id="readsubscription"
+        onclick="toggleSubscription()"><i id="readsubscription-icon" class="fa fa-refresh"></i></button>
     </div>
   </div>
 
@@ -33,17 +33,17 @@
     </div>
   </div>
 
-  <div id="info" class="info-box bg-aqua">
-      <span class="info-box-icon"><i class="ion ion-ios-pricetag"></i></span>
-  
-      <div class="info-box-content">
-        <span id="fqn" class="info-box-number" style="font-size: 24px">OpenIIoT.Simulation.ReadWrite.Write</span>
-        <span id="timestamp" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Timestamp: N/A</span>
-        <span id="quality" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Quality: N/A</span>
-        <button type="button" class="btn btn-lg pull-right bg-aqua" style="margin-top: -43px; margin-right: -4px;" id="subscription"
-          onclick="toggleSubscription()"><i id="subscription-icon" class="fa fa-refresh"></i></button>
-      </div>
+  <div id="writeinfo" class="info-box bg-yellow">
+    <span class="info-box-icon"><i class="ion ion-ios-pricetag"></i></span>
+
+    <div class="info-box-content">
+      <span id="writefqn" class="info-box-number" style="font-size: 24px">OpenIIoT.Simulation.ReadWrite.Write</span>
+      <span id="writetimestamp" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Timestamp: N/A</span>
+      <span id="writequality" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Quality: N/A</span>
+      <button type="button" class="btn btn-lg pull-right bg-yellow" style="margin-top: -43px; margin-right: -4px;" id="writesubscription"
+        onclick="toggleSubscription()"><i id="writesubscription-icon" class="fa fa-refresh"></i></button>
     </div>
+  </div>
 
   <div class="box box-primary">
     <div class="box-header with-border">
@@ -51,11 +51,11 @@
       <h3 class="box-title">Write</h3>
     </div>
     <div class="row margin">
-    <div class="text-center box-body">
-      <input type="text" value="" class="slider form-control" data-slider-min="-200"
-        data-slider-max="200" data-slider-step="5" data-slider-value="[-100,100]" data-slider-orientation="horizontal" data-slider-selection="before"
-        data-slider-tooltip="show" data-slider-id="blue">
-    </div>
+      <div class="text-center box-body">
+        <input id="slider" type="text" value="" class="slider form-control" data-slider-min="-200" data-slider-max="200" data-slider-step="5"
+          data-slider-value="[-100,100]" data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="show"
+          data-slider-id="blue">
+      </div>
     </div>
   </div>
 
@@ -73,21 +73,25 @@
     chat = HubProxyFactory('signalr', 'ItemHub');
     console.log('connected to service');
 
-    $('.slider').slider();
+    $('#slider').slider();
+    $("#slider").on("slide", function (event) {
+      var value = '{ "min":' + event.value[0] + ', "max":' + event.value[1] + ' }';
 
-    $('#ex1').slider({
-      formatter: function (value) {
-        return 'Current value: ' + value;
-      }
+      value = JSON.parse(value);
+
+      write(value);
     });
+
   });
 
   function subscribe(fqn) {
-    chat.invoke('subscribe', $("#fqn").text())
+    chat.invoke('subscribe', $("#readfqn").text())
+    chat.invoke('subscribe', $("#writefqn").text())
   }
 
   function unsubscribe(fqn) {
-    chat.invoke('unsubscribe', $("#fqn").text())
+    chat.invoke('unsubscribe', $("#readfqn").text())
+    chat.invoke('unsubscribe', $("#writefqn").text())
   }
 
   function toggleSubscription(fqn) {
@@ -98,8 +102,8 @@
     }
   }
 
-  function write(fqn, value) {
-    chat.invoke('write', [$("fqn"), $("#value").val()]);
+  function write(value) {
+    chat.invoke('writeToSource', [$("#writefqn").text(), value]);
   }
 
   function HubProxyFactory(serverUrl, hubName) {
@@ -109,27 +113,39 @@
     var proxy = connection.createHubProxy(hubName);
 
     proxy.on('read', function (fqn, item) {
-      var time = JSON.parse(item)
-
-      $("#clock").text(time);
-
       var fqnobj = JSON.parse(fqn);
-      $("#timestamp").text("Timestamp: " + fqnobj.Timestamp);
-      $("#quality").text("Quality: " + fqnobj.Quality);
+
+      if (fqnobj.FQN == $("#readfqn").text()) {
+        $("#clock").text(item);
+        $("#readtimestamp").text("Timestamp: " + fqnobj.Timestamp);
+        $("#readquality").text("Quality: " + fqnobj.Quality);
+      } else {
+        $("#writetimestamp").text("Timestamp: " + fqnobj.Timestamp);
+        $("#writequality").text("Quality: " + fqnobj.Quality);
+      }
+
     });
 
     proxy.on('subscribeSuccess', function (fqn) {
       subscribed = true;
-      $("#info").removeClass("bg-aqua").addClass("bg-green");
-      $("#subscription").removeClass("bg-aqua").addClass("bg-green");
-      $("#subscription-icon").removeClass("fa-refresh").addClass("fa-pause");
+      $("#readinfo").removeClass("bg-yellow").addClass("bg-green");
+      $("#readsubscription").removeClass("bg-yellow").addClass("bg-green");
+      $("#readsubscription-icon").removeClass("fa-refresh").addClass("fa-pause");
+
+      $("#writeinfo").removeClass("bg-yellow").addClass("bg-green");
+      $("#writesubscription").removeClass("bg-yellow").addClass("bg-green");
+      $("#writesubscription-icon").removeClass("fa-refresh").addClass("fa-pause");
     })
 
     proxy.on('unsubscribeSuccess', function (fqn) {
       subscribed = false;
-      $("#info").removeClass("bg-green").addClass("bg-aqua");
-      $("#subscription").removeClass("bg-green").addClass("bg-aqua");
-      $("#subscription-icon").removeClass("fa-pause").addClass("fa-refresh");
+      $("#readinfo").removeClass("bg-green").addClass("bg-yellow");
+      $("#readsubscription").removeClass("bg-green").addClass("bg-yellow");
+      $("#readsubscription-icon").removeClass("fa-pause").addClass("fa-refresh");
+
+      $("#writeinfo").removeClass("bg-green").addClass("bg-yellow");
+      $("#writesubscription").removeClass("bg-green").addClass("bg-yellow");
+      $("#writesubscription-icon").removeClass("fa-pause").addClass("fa-refresh");
     })
 
     connection.start().done(function () {

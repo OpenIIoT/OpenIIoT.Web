@@ -11,14 +11,14 @@
 
 <section class="content container-fluid">
 
-  <div id="info" class="info-box bg-aqua">
+  <div id="info" class="info-box bg-yellow">
     <span class="info-box-icon"><i class="ion ion-ios-pricetag"></i></span>
 
     <div class="info-box-content">
       <span id="fqn" class="info-box-number" style="font-size: 24px">OpenIIoT.Simulation.Math.Trig</span>
       <span id="timestamp" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Timestamp: N/A</span>
       <span id="quality" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Quality: N/A</span>
-      <button type="button" class="btn btn-lg pull-right bg-aqua" style="margin-top: -43px; margin-right: -4px;" id="subscription"
+      <button type="button" class="btn btn-lg pull-right bg-yellow" style="margin-top: -43px; margin-right: -4px;" id="subscription"
         onclick="toggleSubscription()"><i id="subscription-icon" class="fa fa-refresh"></i></button>
     </div>
   </div>
@@ -95,6 +95,8 @@
         data.shift();
       }
 
+      update();
+
       var fqnobj = JSON.parse(fqn);
       $("#timestamp").text("Timestamp: " + fqnobj.Timestamp);
       $("#quality").text("Quality: " + fqnobj.Quality);
@@ -102,16 +104,16 @@
 
     proxy.on('subscribeSuccess', function (fqn) {
       subscribed = true;
-      $("#info").removeClass("bg-aqua").addClass("bg-green");
-      $("#subscription").removeClass("bg-aqua").addClass("bg-green");
+      $("#info").removeClass("bg-yellow").addClass("bg-green");
+      $("#subscription").removeClass("bg-yellow").addClass("bg-green");
       $("#subscription-icon").removeClass("fa-refresh").addClass("fa-pause");
       update();
     })
 
     proxy.on('unsubscribeSuccess', function (fqn) {
       subscribed = false;
-      $("#info").removeClass("bg-green").addClass("bg-aqua");
-      $("#subscription").removeClass("bg-green").addClass("bg-aqua");
+      $("#info").removeClass("bg-green").addClass("bg-yellow");
+      $("#subscription").removeClass("bg-green").addClass("bg-yellow");
       $("#subscription-icon").removeClass("fa-pause").addClass("fa-refresh");
     })
 
@@ -194,9 +196,9 @@
     interactive_plot.setupGrid();
     interactive_plot.draw();
 
-    if (subscribed) {
-      console.log("subscribed");
-      setTimeout(update, updateInterval);
-    }
+    // if (subscribed) {
+    //   console.log("subscribed");
+    //   setTimeout(update, updateInterval);
+    // }
   }
 </script>

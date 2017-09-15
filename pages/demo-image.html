@@ -1,11 +1,12 @@
 ﻿<section class="content-header">
     <h1>
-        Demo - Image
+        Demo: Image
         <small>Demonstrates the ability to transport arbitrary data, in this case an image.</small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-        <li class="active">Here</li>
+        <li><a href="#"><i class="fa fa-home"></i> Home</a></li>
+        <li><a href="#">Demos</a></li>
+        <li class="active">Image</li>
     </ol>
 </section>
 
@@ -43,6 +44,10 @@
         chat = HubProxyFactory('signalr', 'ItemHub');
         console.log('connected to service');
     });
+
+    function readFromSource(fqn){
+        chat.invoke('readfromsource', $("#fqn").text());
+    }
 
     function subscribe(fqn) {
         chat.invoke('subscribe', $("#fqn").text())
@@ -85,6 +90,8 @@
             $("#info").removeClass("bg-yellow").addClass("bg-green");
             $("#subscription").removeClass("bg-yellow").addClass("bg-green");
             $("#subscription-icon").removeClass("fa-refresh").addClass("fa-pause");
+
+            readFromSource();
         })
 
         proxy.on('unsubscribeSuccess', function (fqn) {

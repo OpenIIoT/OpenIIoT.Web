@@ -1,21 +1,136 @@
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-            <h1>
-              Dashboard
-              <small>Optional description</small>
-            </h1>
-            <ol class="breadcrumb">
-              <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-              <li class="active">Here</li>
-            </ol>
-          </section>
-      
-          <!-- Main content -->
-          <section class="content container-fluid">
-      
-            <!--------------------------
-              | Your Page Content Here |
-              -------------------------->
-      
-    </section>
-    <!-- /.content -->
+<section class="content-header">
+  <h1>
+    Dashboard
+    <small>Displays application information.</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Administration</a></li>
+    <li class="active">Dashboard</li>
+  </ol>
+</section>
+
+<section class="content container-fluid">
+
+  <div class="box">
+    <div class="box-header with-border">
+      <h3 class="box-title">Logs</h3>
+      <div class="box-tools">
+        <ul class="pagination pagination-sm no-margin pull-right">
+          <button id="toggle" class="btn btn-sm bg-yellow pull-right" onclick="toggleSubscription()"><i id="toggle-icon" class="fa fa-refresh"></i></button>
+        </ul>
+      </div>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body" style="height: 400px; overflow: auto">
+      <table id="logs" class="table table-bordered">
+        <tr>
+          <th style="width: 10px">T</th>
+          <th style="width: 20px">Time</th>
+          <th style="width: 20px">Level</th>
+          <th style="width: 20px">Logger</th>
+          <th style="width: 100%">Message</th>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <!-- /.box -->
+
+</section>
+
+<script type="text/javascript">
+  var chat;
+  var subscribed;
+
+  $(document).ready(function () {
+    console.log('trying to connect to service');
+    chat = HubProxyFactory('signalr', 'LogHub');
+    console.log('connected to service');
+  });
+
+  $(window).on("beforeunload", function () {
+    unsubscribe("");
+  });
+
+  function subscribe(fqn) {
+    chat.invoke('subscribe', $("#fqn").text())
+  }
+
+  function unsubscribe(fqn) {
+    chat.invoke('unsubscribe', $("#fqn").text())
+  }
+
+  function toggleSubscription(fqn) {
+    if (subscribed) {
+      unsubscribe(fqn);
+    } else {
+      subscribe(fqn);
+    }
+  }
+
+  function getLogLevelLabel(level) {
+    switch (level) {
+      case "Debug":
+        return '<span class="label label-default">DEBUG</span>'
+      case "Info":
+        return '<span class="label label-info">INFO</span>'
+      case "Warning":
+        return '<span class="label label-warning">WARN</span>'
+      case "Error":
+        return '<span class="label label-danger">ERROR</span>'
+      case "Fatal":
+        return '<span class="label label-danger">FATAL</span>'
+    }
+  }
+
+  function scrollToBottom(id) {
+    var div = $("#logs");
+    div.scrollTop = div.scrollHeight - div.clientHeight;
+  }
+
+  function HubProxyFactory(serverUrl, hubName) {
+    console.log("creating hub proxy");
+
+    var connection = $.hubConnection(serverUrl);
+    var proxy = connection.createHubProxy(hubName);
+
+    proxy.on('read', function (log) {
+      var log = JSON.parse(log);
+
+      var time = log.DateTime.split("T")[1];
+      var label = getLogLevelLabel(log.Level.Name);
+
+      var loggerarray = log.Logger.split(".");
+      var logger = loggerarray[loggerarray.length - 1];
+
+      $("#logs tr:first").after("<tr><td>" + log.ThreadID + "</td><td>" + time + "</td><td>" + label + "</td><td>" +
+        logger + "</td><td>" + log.Message + "</td></tr>");
+
+      if ($('#logs tr').length > 100) {
+        $("#logs tr:last").remove();
+      }
+
+      scrollToBottom("#logs")
+
+    });
+
+    proxy.on('subscribeSuccess', function (fqn) {
+      subscribed = true;
+      $("#toggle").removeClass("bg-yellow").addClass("bg-green");
+      $("#toggle-icon").removeClass("fa-refresh").addClass("fa-pause");
+    })
+
+    proxy.on('unsubscribeSuccess', function (fqn) {
+      subscribed = false;
+      $("#toggle").removeClass("bg-green").addClass("bg-yellow");
+      $("#toggle-icon").removeClass("fa-pause").addClass("fa-refresh");
+    })
+
+    connection.start().done(function () {
+      console.log("signalr started");
+      subscribe();
+    });
+
+    console.log("proxy created");
+    return proxy;
+  }
+</script>

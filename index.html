@@ -271,6 +271,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 <script type="text/javascript">
   var active;
+  var hub;
 
   $(document).ready(function() {
     $('#dashboard').click(function() { navigate('dashboard', 'pages/dashboard.html'); });
@@ -300,6 +301,20 @@ scratch. This page gets rid of all links and provides the needed markup only.
     $("#" + id).addClass("active");
     active = id;
     $.cookie("Active-Page", active);
+
+    // unsubscribe from any subscribed item prior to navigating.
+    // this is only necessary because of the fake-SPA functionality of this page
+    try {
+      hub.invoke('unsubscribe', $("#fqn").text());
+    } catch(e) {}
+
+    try {
+      hub.invoke('unsubscribe', $("#readfqn").text());
+    } catch(e) {}
+
+    try {
+      hub.invoke('unsubscribe', $("#writefqn").text());
+    } catch(e) {}
 
     $.get(url, function(response, status, jqXHR) {
       if (response.substring(0,14) == "<!-- login -->") {

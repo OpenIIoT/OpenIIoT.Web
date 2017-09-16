@@ -80,8 +80,9 @@
     if (validateInput()) {
       $.ajax({
         type: "POST",
-        url: "../api/v1/security/sessions?userName=" + $('#input-username').val() + "&password=" + $('#input-password').val(),
+        url: "../api/v1/security/sessions",
         dataType: 'json',
+        data: { "name": $('#input-username').val(), "password": $('#input-password').val() },
         success: function(result) {
           window.location.replace(location.search.substr(1));
         },

@@ -318,6 +318,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
       if ($("#writefqn").text()) hub.invoke('unsubscribe', $("#writefqn").text());
     } catch(e) {}
 
+    try {
+   logHub.invoke('unsubscribe', '');
+    } catch(e) {}
+
     $.get(url, function(response, status, jqXHR) {
       if (response.substring(0,14) == "<!-- login -->") {
         window.location.replace(location.href.replace(/[^/]*$/, ''));

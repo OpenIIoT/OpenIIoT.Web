@@ -1,0 +1,141 @@
+﻿<section class="content-header">
+    <h1>
+        Demo: Clock
+        <small>Demonstrates the update rate.</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-home"></i> Home</a></li>
+        <li><a href="#">Demos</a></li>
+        <li class="active">Clock</li>
+    </ol>
+</section>
+
+<section class="content container-fluid">
+
+    <div id="info" class="info-box bg-yellow">
+        <span class="info-box-icon"><i class="ion ion-ios-pricetag"></i></span>
+
+        <div class="info-box-content">
+            <span id="fqn" class="info-box-number" style="font-size: 24px">OpenIIoT.SQL.Demo.Batches</span>
+            <span id="timestamp" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Timestamp: N/A</span>
+            <span id="quality" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Quality: N/A</span>
+            <button type="button" class="btn btn-lg pull-right bg-yellow" style="margin-top: -43px; margin-right: -4px;" id="subscription"
+                onclick="toggleSubscription()"><i id="subscription-icon" class="fa fa-refresh"></i></button>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">Batch Records</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" style="height: 400px; overflow: auto">
+          <table id="logs" class="table table-bordered">
+            <tr>
+                <th>Status</th>
+              <th>BatchID</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>StartTime</th>
+              <th>EndTime</th>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <!-- /.box -->
+</section>
+
+<script type="text/javascript">
+    var subscribed;
+
+    $(document).ready(function () {
+        console.log('trying to connect to service');
+        hub = HubProxyFactory('signalr', 'ItemHub');
+        console.log('connected to service');
+    });
+
+    function subscribe(fqn) {
+        hub.invoke('subscribe', $("#fqn").text())
+    }
+
+    function unsubscribe(fqn) {
+        hub.invoke('unsubscribe', $("#fqn").text())
+    }
+
+    function toggleSubscription(fqn) {
+        if (subscribed) {
+            unsubscribe(fqn);
+        } else {
+            subscribe(fqn);
+        }
+    }
+
+    function write(fqn, value) {
+        hub.invoke('write', [$("fqn"), $("#value").val()]);
+    }
+
+    function getBatchLabel(batch) {
+      if (batch.EndTime) {
+        return '<span class="label label-default">CLOSED</span>'
+      }
+      else {
+        return '<span class="label label-success">OPEN</span>'
+      }
+    }
+
+    function HubProxyFactory(serverUrl, hubName) {
+        console.log("creating hub proxy");
+
+        var connection = $.hubConnection(serverUrl);
+        var proxy = connection.createHubProxy(hubName);
+
+        proxy.on('read', function (fqn, item) {
+            var batches = JSON.parse(item)
+
+            console.log(batches);
+
+            $("#logs td").remove();
+            
+            batches.forEach(function(batch, index) {
+                $("#logs tr:first").after(
+                    "<tr>" + 
+                    "<td>" + getBatchLabel(batch) + "</td>" + 
+                    "<td>" + batch.BatchID.split("-")[0] + "</td>" + 
+                    "<td>" + batch.Name + "</td>" + 
+                    "<td>" + batch.Quantity + "</td>" + 
+                    "<td>" + batch.StartTime + "</td>" + 
+                    "<td>" + batch.EndTime + "</td>" + 
+                    "</tr>"
+                );
+
+            });
+
+
+            var fqnobj = JSON.parse(fqn);
+            $("#timestamp").text("Timestamp: " + fqnobj.Timestamp);
+            $("#quality").text("Quality: " + fqnobj.Quality);
+        });
+
+        proxy.on('subscribeSuccess', function (fqn) {
+            subscribed = true;
+            $("#info").removeClass("bg-yellow").addClass("bg-green");
+            $("#subscription").removeClass("bg-yellow").addClass("bg-green");
+            $("#subscription-icon").removeClass("fa-refresh").addClass("fa-pause");
+        })
+
+        proxy.on('unsubscribeSuccess', function (fqn) {
+            subscribed = false;
+            $("#info").removeClass("bg-green").addClass("bg-yellow");
+            $("#subscription").removeClass("bg-green").addClass("bg-yellow");
+            $("#subscription-icon").removeClass("fa-pause").addClass("fa-refresh");
+        })
+
+        connection.start().done(function () {
+            console.log("signalr started");
+            //subscribe();
+        });
+
+        console.log("proxy created");
+        return proxy;
+    }
+</script>

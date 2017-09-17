@@ -21,17 +21,20 @@
 <body class="hold-transition login-page">
 <div class="login-box">
   <div class="login-logo">
-    <a href="../index.html"><img src="../assets/img/openiiot-logo-white.png" height="75"><br/> Open<b>IIoT</b></a>
+      <a href="../index.html">
+        <img src="../assets/img/openiiot-logo-white.png" height="60">
+        <span>Open<strong>IIoT</strong></span>
+      </a>
   </div>
   <!-- /.login-logo -->
-  <div id="login-box" class="login-box-body">
-    <div id="username-group" class="input-group">
-		  <span class="input-group-addon"><i class="fa fa-user"></i></span>
+  <div id="login-box" class="login-box-body"  style="box-shadow: 0 0 60px black;">
+    <div id="username-group" class="input-group margin-bottom-sm">
+		  <span class="input-group-addon" style="background: #f3f3f3"><i class="fa fa-user"></i></span>
 		  <input type="user" id="input-username" class="form-control" placeholder="Username">
     </div>
 	  <br/>
     <div id="password-group" class="input-group">
-		  <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+		  <span class="input-group-addon" style="background: #f3f3f3"><i class="fa fa-lock" aria-hidden="true"></i></span>
       <input type="password" id="input-password" class="form-control" placeholder="Password">
     </div>
 	  <br/>
@@ -84,7 +87,10 @@
         dataType: 'json',
         data: { "name": $('#input-username').val(), "password": $('#input-password').val() },
         success: function(result) {
-          window.location.replace(location.search.substr(1));
+          var destination = location.search.substr(1);
+
+          if (!destination) destination = "../";
+          window.location.replace(destination);
         },
         error: function(result) {
           shake();

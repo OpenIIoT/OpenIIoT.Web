@@ -97,12 +97,12 @@
 </section>
 
 <script type="text/javascript">
-  var chat;
+  var logHub;
   var subscribed;
 
   $(document).ready(function () {
     console.log('trying to connect to service');
-    chat = HubProxyFactory('signalr', 'LogHub');
+    logHub = HubProxyFactory('signalr', 'LogHub');
     console.log('connected to service');
   });
 
@@ -111,11 +111,11 @@
   });
 
   function subscribe(fqn) {
-    chat.invoke('subscribe', $("#fqn").text())
+    logHub.invoke('subscribe', '')
   }
 
   function unsubscribe(fqn) {
-    chat.invoke('unsubscribe', $("#fqn").text())
+    logHub.invoke('unsubscribe', '')
   }
 
   function toggleSubscription(fqn) {

@@ -53,8 +53,8 @@
     </div>
     <div class="row margin">
       <div class="text-center box-body">
-        <input id="slider" type="text" value="" class="slider form-control" data-slider-min="-200" data-slider-max="200" data-slider-step="5"
-          data-slider-value="[-100,100]" data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="show"
+        <input id="slider" type="text" value="" class="slider form-control" data-slider-min="-100" data-slider-max="100" data-slider-step="1"
+          data-slider-value="[-50,50]" data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="show"
           data-slider-id="blue">
       </div>
     </div>
@@ -66,12 +66,11 @@
 
 
 <script type="text/javascript">
-  var chat;
   var subscribed;
 
   $(document).ready(function () {
     console.log('trying to connect to service');
-    chat = HubProxyFactory('signalr', 'ItemHub');
+    hub = HubProxyFactory('signalr', 'ItemHub');
     console.log('connected to service');
 
     $('#slider').slider();
@@ -86,13 +85,15 @@
   });
 
   function subscribe(fqn) {
-    chat.invoke('subscribe', $("#readfqn").text())
-    chat.invoke('subscribe', $("#writefqn").text())
+    if (!subscribed) {
+    hub.invoke('subscribe', $("#readfqn").text())
+    hub.invoke('subscribe', $("#writefqn").text())
+    }
   }
 
   function unsubscribe(fqn) {
-    chat.invoke('unsubscribe', $("#readfqn").text())
-    chat.invoke('unsubscribe', $("#writefqn").text())
+    hub.invoke('unsubscribe', $("#readfqn").text())
+    hub.invoke('unsubscribe', $("#writefqn").text())
   }
 
   function toggleSubscription(fqn) {
@@ -104,7 +105,7 @@
   }
 
   function write(value) {
-    chat.invoke('writeToSource', [$("#writefqn").text(), value]);
+    hub.invoke('writeToSource', [$("#writefqn").text(), value]);
   }
 
   function HubProxyFactory(serverUrl, hubName) {

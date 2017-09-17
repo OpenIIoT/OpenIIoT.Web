@@ -36,25 +36,24 @@
 </section>
 
 <script type="text/javascript">
-    var chat;
     var subscribed;
 
     $(document).ready(function () {
         console.log('trying to connect to service');
-        chat = HubProxyFactory('signalr', 'ItemHub');
+        hub = HubProxyFactory('signalr', 'ItemHub');
         console.log('connected to service');
     });
 
     function readFromSource(fqn){
-        chat.invoke('readfromsource', $("#fqn").text());
+        hub.invoke('readfromsource', $("#fqn").text());
     }
 
     function subscribe(fqn) {
-        chat.invoke('subscribe', $("#fqn").text())
+        hub.invoke('subscribe', $("#fqn").text())
     }
 
     function unsubscribe(fqn) {
-        chat.invoke('unsubscribe', $("#fqn").text())
+        hub.invoke('unsubscribe', $("#fqn").text())
     }
 
     function toggleSubscription(fqn) {
@@ -66,7 +65,7 @@
     }
 
     function write(fqn, value) {
-        chat.invoke('write', [$("fqn"), $("#value").val()]);
+        hub.invoke('write', [$("fqn"), $("#value").val()]);
     }
 
     function HubProxyFactory(serverUrl, hubName) {

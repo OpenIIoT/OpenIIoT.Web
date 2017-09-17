@@ -16,7 +16,7 @@
         <span class="info-box-icon"><i class="ion ion-ios-pricetag"></i></span>
 
         <div class="info-box-content">
-            <span id="fqn" class="info-box-number" style="font-size: 24px">OpenIIoT.Simulation.DateTime.Time</span>
+            <span id="fqn" class="info-box-number" style="font-size: 24px">OpenIIoT.SQL.Demo.Batches</span>
             <span id="timestamp" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Timestamp: N/A</span>
             <span id="quality" class="info-box-number float-left" style="font-weight: 400; font-size: 16px">Quality: N/A</span>
             <button type="button" class="btn btn-lg pull-right bg-yellow" style="margin-top: -43px; margin-right: -4px;" id="subscription"
@@ -24,15 +24,25 @@
         </div>
     </div>
 
-    <div class="box box-primary">
+    <div class="box">
         <div class="box-header with-border">
-            <i class="fa fa-clock-o"></i>
-            <h3 class="box-title">Clock</h3>
+          <h3 class="box-title">Batch Records</h3>
         </div>
-        <div id="clock" class="box-body text-center info-box-text" style="font-size: 42px">
-            HH:MM:SS.NNN
+        <!-- /.box-header -->
+        <div class="box-body" style="height: 400px; overflow: auto">
+          <table id="logs" class="table table-bordered">
+            <tr>
+                <th>Status</th>
+              <th>BatchID</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>StartTime</th>
+              <th>EndTime</th>
+            </tr>
+          </table>
         </div>
-    </div>
+      </div>
+      <!-- /.box -->
 </section>
 
 <script type="text/javascript">
@@ -64,6 +74,15 @@
         hub.invoke('write', [$("fqn"), $("#value").val()]);
     }
 
+    function getBatchLabel(batch) {
+      if (batch.EndTime) {
+        return '<span class="label label-default">CLOSED</span>'
+      }
+      else {
+        return '<span class="label label-success">OPEN</span>'
+      }
+    }
+
     function HubProxyFactory(serverUrl, hubName) {
         console.log("creating hub proxy");
 
@@ -71,9 +90,26 @@
         var proxy = connection.createHubProxy(hubName);
 
         proxy.on('read', function (fqn, item) {
-            var time = JSON.parse(item)
+            var batches = JSON.parse(item)
 
-            $("#clock").text(time);
+            console.log(batches);
+
+            $("#logs td").remove();
+            
+            batches.forEach(function(batch, index) {
+                $("#logs tr:first").after(
+                    "<tr>" + 
+                    "<td>" + getBatchLabel(batch) + "</td>" + 
+                    "<td>" + batch.BatchID.split("-")[0] + "</td>" + 
+                    "<td>" + batch.Name + "</td>" + 
+                    "<td>" + batch.Quantity + "</td>" + 
+                    "<td>" + batch.StartTime + "</td>" + 
+                    "<td>" + batch.EndTime + "</td>" + 
+                    "</tr>"
+                );
+
+            });
+
 
             var fqnobj = JSON.parse(fqn);
             $("#timestamp").text("Timestamp: " + fqnobj.Timestamp);

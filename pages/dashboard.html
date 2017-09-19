@@ -269,16 +269,15 @@
   });
 
   function showTooltip(x, y, contents) {
-        $('<span id="tooltip" class="popover">' + contents + '</span>').css({
+        $('<span id="tooltip" class="" style="box-shadow: 5px 5px 10px #808080"><strong>' + contents + '</strong></span>').css({
             position: 'absolute',
             display: 'none',
             top: y + 10,
             left: x + 10,
-            border: '1px solid #000',
-            padding: '5x',
-            color: "#FFF",
-            'box-blur': '0px 0px 20px',
-            'background-color': '#000'
+            border: '0px solid #000',
+            padding: '5px',
+            color: "#000000",
+            background: "#f5f5f5"
         }).appendTo("body").fadeIn(10);
     }
 

@@ -212,64 +212,62 @@
   
   function getCPUData() {
     fetchLatestCPUValue();    
-
-    var res = []
-    for (var i = 0; i < cpu.length; ++i) {
-      res.push([i, cpu[i]])
-    }
-
-    return res
+    return makeDataSet(cpu);
   }
 
   function getMemoryData() {
-    fetchLatestMemoryValue();    
-
-    var res = []
-    for (var i = 0; i < memory.length; ++i) {
-      res.push([i, memory[i]])
-    }
-
-    return res
+    fetchLatestMemoryValue(); 
+    return makeDataSet(memory);
   }
 
   function getDiskData() {
     fetchLatestDiskValue();    
+    return makeDataSet(disk);
+  }
+  
+  function makeDataSet(array) {
+    if (array.length < 120) {
+      for (var i = 120; i > 0; i--) {
+        array.push(0);
+      }
+    }
 
     var res = []
-    for (var i = 0; i < disk.length; ++i) {
-      res.push([i, disk[i]])
+    for (var i = 0; i < array.length; ++i) {
+      res.push([i, array[i]])
     }
 
     return res
   }
 
+
   function fetchLatestCPUValue() {
     $.get("api/v1/item/read/OpenIIoT.System.Platform.CPU.%25%20Processor%20Time/true", function(data) {
-      cpu.push(data.Value);
-
       if (cpu.length > 120) {
         cpu.shift();
       }
+
+      cpu.push(data.Value);
     });
   }
   
   function fetchLatestMemoryValue() {
     $.get("api/v1/item/read/OpenIIoT.System.Platform.Memory.%25%20Used/true", function(data) {
-      memory.push(data.Value);
-
       if (memory.length > 120) {
         memory.shift();
       }
+
+      memory.push(data.Value);
     });
   }
 
   function fetchLatestDiskValue() {
     $.get("api/v1/item/read/OpenIIoT.System.Platform.Drives.%25%20Disk%20Time/true", function(data) {
-      disk.push(data.Value);
-
       if (disk.length > 120) {
         disk.shift();
       }
+  
+      disk.push(data.Value);
     });
   }
 
@@ -300,7 +298,7 @@
     },
     yaxis: {
       min: 0,
-      max: 120,
+      max: 100,
       ticks: 10,
       show: true
     },

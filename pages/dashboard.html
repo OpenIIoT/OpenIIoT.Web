@@ -18,14 +18,12 @@
         <div class="box-header with-border">
           <i class="fa fa-microchip"></i>
 
-          <h3 class="box-title">CPU</h3>
+          <h3 class="box-title">Performance</h3>
 
           <div class="box-tools pull-right">
-            Real time
-            <div class="btn-group" id="cpu" data-toggle="btn-toggle">
-              <button type="button" class="btn btn-default btn-xs active" data-toggle="on">On</button>
-              <button type="button" class="btn btn-default btn-xs" data-toggle="off">Off</button>
-            </div>
+              <button id="cpuseries" type="button" class="btn btn-primary btn-xs" onclick="togglecpu()">CPU</button>
+              <button id="memoryseries" type="button" class="btn bg-purple btn-xs" onclick="togglememory()">Memory</button>
+              <button id="diskseries" type="button" class="btn btn-success btn-xs" onclick="toggledisk()">Disk</button>
           </div>
         </div>
         <div class="box-body">
@@ -74,16 +72,56 @@
 <script type="text/javascript">
   var logHub;
   var subscribed;
+  var cpuseries;
+  var memoryseries;
+  var diskseries;
 
   $(document).ready(function () {
     console.log('trying to connect to service');
     logHub = HubProxyFactory('signalr', 'LogHub');
     console.log('connected to service');
+
+    cpuseries = true;
+    memoryseries = true;
+    diskseries = true;
   });
 
   $(window).on("beforeunload", function () {
     unsubscribe("");
   });
+
+  function togglecpu() {
+    if (cpuseries) {
+      cpuseries = false;
+      $("#cpuseries").removeClass("btn-primary").addClass("btn-default");
+    }
+    else {
+      cpuseries = true;
+      $("#cpuseries").removeClass("btn-default").addClass("btn-primary");
+    }
+  }
+
+  function togglememory() {
+    if (memoryseries) {
+      memoryseries = false;
+      $("#memoryseries").removeClass("bg-purple").addClass("btn-default");
+    }
+    else {
+      memoryseries = true;
+      $("#memoryseries").removeClass("btn-default").addClass("bg-purple");
+    }
+  }
+
+  function toggledisk() {
+    if (diskseries) {
+      diskseries = false;
+      $("#diskseries").removeClass("btn-success").addClass("btn-default");
+    }
+    else {
+      diskseries = true;
+      $("#diskseries").removeClass("btn-default").addClass("btn-success");
+    }
+  }
 
   function subscribe(fqn) {
     logHub.invoke('subscribe', '')
@@ -107,7 +145,7 @@
         return '<span class="label label-default">DEBUG</span>'
       case "Info":
         return '<span class="label label-info">INFO</span>'
-      case "Warning":
+      case "Warn":
         return '<span class="label label-warning">WARN</span>'
       case "Error":
         return '<span class="label label-danger">ERROR</span>'
@@ -168,80 +206,82 @@
     return proxy;
   }
 
-  /*
-   * Flot Interactive Chart
-   * -----------------------
-   */
-  // We use an inline data source in the example, usually data would
-  // be fetched from a server
-  var data = [],
-    data2 = [],
-    totalPoints = 100
+  var cpu = [];
+  var memory = [];
+  var disk = [];
+  
+  function getCPUData() {
+    fetchLatestCPUValue();    
 
-  function getRandomData() {
-
-    if (data.length > 0)
-      data = data.slice(1)
-
-    // Do a random walk
-    while (data.length < totalPoints) {
-
-      var prev = data.length > 0 ? data[data.length - 1] : 50,
-        y = prev + Math.random() * 10 - 5
-
-      if (y < 0) {
-        y = 0
-      } else if (y > 100) {
-        y = 100
-      }
-
-      data.push(y)
-    }
-
-    // Zip the generated y values with the x values
     var res = []
-    for (var i = 0; i < data.length; ++i) {
-      res.push([i, data[i]])
+    for (var i = 0; i < cpu.length; ++i) {
+      res.push([i, cpu[i]])
     }
 
     return res
   }
 
-  function getRandomData2() {
+  function getMemoryData() {
+    fetchLatestMemoryValue();    
 
-    if (data2.length > 0)
-      data2 = data2.slice(1)
-
-    // Do a random walk
-    while (data2.length < totalPoints) {
-
-      var prev = data2.length > 0 ? data2[data2.length - 1] : 50,
-        y = prev + Math.random() * 10 - 5
-
-      if (y < 0) {
-        y = 0
-      } else if (y > 100) {
-        y = 100
-      }
-
-      data2.push(y)
-    }
-
-    // Zip the generated y values with the x values
     var res = []
-    for (var i = 0; i < data2.length; ++i) {
-      res.push([i, data2[i]])
+    for (var i = 0; i < memory.length; ++i) {
+      res.push([i, memory[i]])
     }
 
     return res
+  }
+
+  function getDiskData() {
+    fetchLatestDiskValue();    
+
+    var res = []
+    for (var i = 0; i < disk.length; ++i) {
+      res.push([i, disk[i]])
+    }
+
+    return res
+  }
+
+  function fetchLatestCPUValue() {
+    $.get("../api/read/OpenIIoT.System.Platform.CPU.%25%20Processor%20Time/true", function(data) {
+      cpu.push(data.Value);
+
+      if (cpu.length > 120) {
+        cpu.shift();
+      }
+    });
+  }
+  
+  function fetchLatestMemoryValue() {
+    $.get("../api/read/OpenIIoT.System.Platform.Memory.%25%20Used/true", function(data) {
+      memory.push(data.Value);
+
+      if (memory.length > 120) {
+        memory.shift();
+      }
+    });
+  }
+
+  function fetchLatestDiskValue() {
+    $.get("../api/read/OpenIIoT.System.Platform.Drives.%25%20Disk%20Time/true", function(data) {
+      disk.push(data.Value);
+
+      if (disk.length > 120) {
+        disk.shift();
+      }
+    });
   }
 
   var cpu_interactive_plot = $.plot('#cpu-interactive', [{
     label: "CPU",
-    data: getRandomData()
+    data: getCPUData()
   }, {
     label: "Memory",
-    data: getRandomData2()
+    data: getMemoryData()
+  }, {
+    label: "Disk",
+    data: getDiskData()
   }], {
     grid: {
       borderColor: '#f3f3f3',
@@ -249,36 +289,40 @@
       tickColor: '#f3f3f3',
       hoverable: true
     },
-    colors: [ "#3c8dbc", "#605ca8"],
+    colors: [ "#3c8dbc", "#605ca8", "#00a65a"],
     series: {
       lines: { show: true },
       shadowSize: 0, // Drawing is faster without shadows
     },
     lines: {
-      fill: true, //Converts the line chart to area chart
-      lineWidth: 3
+      fill: .05, //Converts the line chart to area chart
+      lineWidth: 2
     },
     yaxis: {
       min: 0,
       max: 100,
+      ticks: 10,
       show: true
     },
     xaxis: {
-      show: true
+        ticks: 0,
+        mode: "time",
+        min: 0,
+        max: 120,
+        show: true
     }
   });
 
   function showTooltip(x, y, contents) {
-        $('<span id="tooltip" class="popover">' + contents + '</span>').css({
+        $('<span id="tooltip" class="" style="box-shadow: 5px 5px 10px #808080"><strong>' + contents + '</strong></span>').css({
             position: 'absolute',
             display: 'none',
             top: y + 10,
             left: x + 10,
-            border: '1px solid #000',
-            padding: '5x',
-            color: "#FFF",
-            'box-blur': '0px 0px 20px',
-            'background-color': '#000'
+            border: '0px solid #000',
+            padding: '5px',
+            color: "#000000",
+            background: "#f3f3f3"
         }).appendTo("body").fadeIn(10);
     }
 
@@ -290,9 +334,9 @@
 
                 $("#tooltip").remove();
                 var x = item.datapoint[0].toFixed(0),
-                    y = item.datapoint[1].toFixed(0);
+                    y = item.datapoint[1].toFixed(2);
 
-                showTooltip(item.pageX, item.pageY, item.series.label + ": " + y );
+                showTooltip(item.pageX, item.pageY, item.series.label + ": " + y + "%");
             }
         }
         else {
@@ -304,9 +348,11 @@
   var updateInterval = 1000 //Fetch data ever x milliseconds
   var realtime = 'on' //If == to on then fetch data every x seconds. else stop fetching
   function update() {
-
     cpu_interactive_plot.setData([
-      { label: "CPU", data: getRandomData() },{ label: "Memory", data :getRandomData2() }])
+      { label: "CPU", data: getCPUData() },
+      { label: "Memory", data: getMemoryData() },
+      { label: "Disk", data: getDiskData() },
+      ])
 
     // Since the axes don't change, we don't need to call plot.setupGrid()
     cpu_interactive_plot.draw()

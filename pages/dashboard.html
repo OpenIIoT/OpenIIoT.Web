@@ -244,7 +244,7 @@
   }
 
   function fetchLatestCPUValue() {
-    $.get("../api/read/OpenIIoT.System.Platform.CPU.%25%20Processor%20Time/true", function(data) {
+    $.get("api/v1/item/read/OpenIIoT.System.Platform.CPU.%25%20Processor%20Time/true", function(data) {
       cpu.push(data.Value);
 
       if (cpu.length > 120) {
@@ -254,7 +254,7 @@
   }
   
   function fetchLatestMemoryValue() {
-    $.get("../api/read/OpenIIoT.System.Platform.Memory.%25%20Used/true", function(data) {
+    $.get("api/v1/item/read/OpenIIoT.System.Platform.Memory.%25%20Used/true", function(data) {
       memory.push(data.Value);
 
       if (memory.length > 120) {
@@ -264,7 +264,7 @@
   }
 
   function fetchLatestDiskValue() {
-    $.get("../api/read/OpenIIoT.System.Platform.Drives.%25%20Disk%20Time/true", function(data) {
+    $.get("api/v1/item/read/OpenIIoT.System.Platform.Drives.%25%20Disk%20Time/true", function(data) {
       disk.push(data.Value);
 
       if (disk.length > 120) {

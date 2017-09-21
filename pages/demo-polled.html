@@ -1,0 +1,29 @@
+<html>
+
+<head>
+    <title>Bare Bones Demo</title>
+</head>
+
+<body>
+    <center>
+        <div id="openiiot"></div>
+    </center>
+</body>
+
+</html>
+
+<script src="../node_modules/jquery/dist/jquery.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        update();
+    });
+
+    function update() {
+        $.get("../api/v1/item/read/OpenIIoT.Simulation.DateTime.Time/true", function (data) {
+            $("#openiiot").text(data.Value);
+        });
+
+        setTimeout(update, 1000)
+    }
+</script>

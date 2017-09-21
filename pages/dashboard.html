@@ -21,9 +21,9 @@
           <h3 class="box-title">Performance</h3>
 
           <div class="box-tools pull-right">
-              <button id="cpuseries" type="button" class="btn btn-primary btn-xs" onclick="togglecpu()">CPU</button>
-              <button id="memoryseries" type="button" class="btn bg-purple btn-xs" onclick="togglememory()">Memory</button>
-              <button id="diskseries" type="button" class="btn btn-success btn-xs" onclick="toggledisk()">Disk</button>
+            <button id="cpuseries" type="button" class="btn btn-primary btn-xs" onclick="togglecpu()">CPU</button>
+            <button id="memoryseries" type="button" class="btn bg-purple btn-xs" onclick="togglememory()">Memory</button>
+            <button id="diskseries" type="button" class="btn btn-success btn-xs" onclick="toggledisk()">Disk</button>
           </div>
         </div>
         <div class="box-body">
@@ -94,8 +94,7 @@
     if (cpuseries) {
       cpuseries = false;
       $("#cpuseries").removeClass("btn-primary").addClass("btn-default");
-    }
-    else {
+    } else {
       cpuseries = true;
       $("#cpuseries").removeClass("btn-default").addClass("btn-primary");
     }
@@ -105,8 +104,7 @@
     if (memoryseries) {
       memoryseries = false;
       $("#memoryseries").removeClass("bg-purple").addClass("btn-default");
-    }
-    else {
+    } else {
       memoryseries = true;
       $("#memoryseries").removeClass("btn-default").addClass("bg-purple");
     }
@@ -116,8 +114,7 @@
     if (diskseries) {
       diskseries = false;
       $("#diskseries").removeClass("btn-success").addClass("btn-default");
-    }
-    else {
+    } else {
       diskseries = true;
       $("#diskseries").removeClass("btn-default").addClass("btn-success");
     }
@@ -209,22 +206,22 @@
   var cpu = [];
   var memory = [];
   var disk = [];
-  
+
   function getCPUData() {
-    fetchLatestCPUValue();    
+    fetchLatestCPUValue();
     return makeDataSet(cpu);
   }
 
   function getMemoryData() {
-    fetchLatestMemoryValue(); 
+    fetchLatestMemoryValue();
     return makeDataSet(memory);
   }
 
   function getDiskData() {
-    fetchLatestDiskValue();    
+    fetchLatestDiskValue();
     return makeDataSet(disk);
   }
-  
+
   function makeDataSet(array) {
     if (array.length < 120) {
       for (var i = 120; i > 0; i--) {
@@ -242,7 +239,7 @@
 
 
   function fetchLatestCPUValue() {
-    $.get("api/v1/item/read/OpenIIoT.System.Platform.CPU.%25%20Processor%20Time/true", function(data) {
+    $.get("api/v1/item/read/OpenIIoT.System.Platform.CPU.%25%20Processor%20Time/true", function (data) {
       if (cpu.length > 120) {
         cpu.shift();
       }
@@ -250,9 +247,9 @@
       cpu.push(data.Value);
     });
   }
-  
+
   function fetchLatestMemoryValue() {
-    $.get("api/v1/item/read/OpenIIoT.System.Platform.Memory.%25%20Used/true", function(data) {
+    $.get("api/v1/item/read/OpenIIoT.System.Platform.Memory.%25%20Used/true", function (data) {
       if (memory.length > 120) {
         memory.shift();
       }
@@ -262,11 +259,11 @@
   }
 
   function fetchLatestDiskValue() {
-    $.get("api/v1/item/read/OpenIIoT.System.Platform.Drives.%25%20Disk%20Time/true", function(data) {
+    $.get("api/v1/item/read/OpenIIoT.System.Platform.Drives.%25%20Disk%20Time/true", function (data) {
       if (disk.length > 120) {
         disk.shift();
       }
-  
+
       disk.push(data.Value);
     });
   }
@@ -287,9 +284,11 @@
       tickColor: '#f3f3f3',
       hoverable: true
     },
-    colors: [ "#3c8dbc", "#605ca8", "#00a65a"],
+    colors: ["#3c8dbc", "#605ca8", "#00a65a"],
     series: {
-      lines: { show: true },
+      lines: {
+        show: true
+      },
       shadowSize: 0, // Drawing is faster without shadows
     },
     lines: {
@@ -303,75 +302,71 @@
       show: true
     },
     xaxis: {
-        ticks: 0,
-        mode: "time",
-        min: 0,
-        max: 120,
-        show: true
+      ticks: 0,
+      mode: "time",
+      min: 0,
+      max: 120,
+      show: true
     }
   });
 
   function showTooltip(x, y, contents) {
-        $('<span id="tooltip" class="" style="box-shadow: 5px 5px 10px #808080"><strong>' + contents + '</strong></span>').css({
-            position: 'absolute',
-            display: 'none',
-            top: y + 10,
-            left: x + 10,
-            border: '0px solid #000',
-            padding: '5px',
-            color: "#000000",
-            background: "#f3f3f3"
-        }).appendTo("body").fadeIn(10);
+    $('<span id="tooltip" class="" style="box-shadow: 5px 5px 10px #808080"><strong>' + contents + '</strong></span>').css({
+      position: 'absolute',
+      display: 'none',
+      top: y + 10,
+      left: x + 10,
+      border: '0px solid #000',
+      padding: '5px',
+      color: "#000000",
+      background: "#f3f3f3"
+    }).appendTo("body").fadeIn(10);
+  }
+
+  var previousPoint = null;
+  $("#cpu-interactive").bind("plothover", function (event, pos, item) {
+    if (item) {
+      if (previousPoint != item.dataIndex) {
+        previousPoint = item.dataIndex;
+
+        $("#tooltip").remove();
+        var x = item.datapoint[0].toFixed(0),
+          y = item.datapoint[1].toFixed(2);
+
+        showTooltip(item.pageX, item.pageY, item.series.label + ": " + y + "%");
+      }
+    } else {
+      $("#tooltip").remove();
+      previousPoint = null;
     }
-
-    var previousPoint = null;
-    $("#cpu-interactive").bind("plothover", function (event, pos, item) {
-        if (item) {
-            if (previousPoint != item.dataIndex) {
-                previousPoint = item.dataIndex;
-
-                $("#tooltip").remove();
-                var x = item.datapoint[0].toFixed(0),
-                    y = item.datapoint[1].toFixed(2);
-
-                showTooltip(item.pageX, item.pageY, item.series.label + ": " + y + "%");
-            }
-        }
-        else {
-            $("#tooltip").remove();
-            previousPoint = null;
-        }
-    });
+  });
 
   var updateInterval = 1000 //Fetch data ever x milliseconds
-  var realtime = 'on' //If == to on then fetch data every x seconds. else stop fetching
+
   function update() {
-    cpu_interactive_plot.setData([
-      { label: "CPU", data: getCPUData() },
-      { label: "Memory", data: getMemoryData() },
-      { label: "Disk", data: getDiskData() },
+    if (active == 'dashboard') {
+      cpu_interactive_plot.setData([{
+          label: "CPU",
+          data: getCPUData()
+        },
+        {
+          label: "Memory",
+          data: getMemoryData()
+        },
+        {
+          label: "Disk",
+          data: getDiskData()
+        },
       ])
-
-    // Since the axes don't change, we don't need to call plot.setupGrid()
-    cpu_interactive_plot.draw()
-    if (realtime === 'on')
-      setTimeout(update, updateInterval)
-  }
-
-  //INITIALIZE REALTIME DATA FETCHING
-  if (realtime === 'on') {
-    update()
-  }
-  //REALTIME TOGGLE
-  $('#realtime .btn').click(function () {
-    if ($(this).data('toggle') === 'on') {
-      realtime = 'on'
-    } else {
-      realtime = 'off'
     }
-    update()
-  })
-  /*
-   * END INTERACTIVE CHART
-   */
+
+    cpu_interactive_plot.draw()
+    window.setTimeout(update, updateInterval)
+
+  }
+
+  if (!updating) {
+    updating = true;
+    update();
+  }
 </script>

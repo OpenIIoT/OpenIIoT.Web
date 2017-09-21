@@ -9,6 +9,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>OpenIIoT 0.5.0</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="shortcut icon" href="assets/img/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
   <link rel="stylesheet" href="node_modules/ionicons/dist/css/ionicons.min.css">
@@ -280,6 +281,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script type="text/javascript">
   var active;
   var hub;
+  var updating = false;
 
   $(document).ready(function() {
     $('#dashboard').click(function() { navigate('dashboard', 'pages/dashboard.html'); });
@@ -326,7 +328,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     } catch(e) {}
 
     try {
-   logHub.invoke('unsubscribe', '');
+      logHub.invoke('unsubscribe', '');
     } catch(e) {}
 
     $.get(url, function(response, status, jqXHR) {

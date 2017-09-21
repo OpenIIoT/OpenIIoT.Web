@@ -1,0 +1,36 @@
+﻿<html>
+
+<head>
+    <title>Bare Bones Demo</title>
+</head>
+
+<body>
+    <center>
+        <div id="openiiot"></div>
+    </center>
+</body>
+
+</html>
+
+<script src="../node_modules/jquery/dist/jquery.js"></script>
+<script src="../node_modules/signalr/jquery.signalR.js"></script>
+<script src="../signalr/hubs"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        startSignalR('../signalr', 'ItemHub', 'OpenIIoT.Simulation.DateTime.Time', '#openiiot');
+    });
+
+    function startSignalR(serverUrl, hubName, itemName, id) {
+        var connection = $.hubConnection(serverUrl);
+        var proxy = connection.createHubProxy(hubName);
+
+        proxy.on('read', function (fqn, item) {
+            $(id).text(JSON.parse(item));
+        });
+
+        connection.start().done(function () {
+            proxy.invoke('subscribe', itemName);
+        });
+    }
+</script>

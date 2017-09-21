@@ -471,7 +471,7 @@ a:focus {
 .user-panel {
   position: relative;
   width: 100%;
-  padding: 10px 10px 0px 10px;
+  padding: 10px 10px 10px 10px;
   overflow: hidden;
 }
 .user-panel:before,
@@ -495,7 +495,7 @@ a:focus {
 }
 .user-panel > .info > p {
   font-weight: 600;
-  margin-bottom: 9px;
+  margin-bottom: 6px;
 }
 .user-panel > .info > a {
   text-decoration: none;

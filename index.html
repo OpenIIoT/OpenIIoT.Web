@@ -10,7 +10,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>OpenIIoT 0.5.0</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <link rel="shortcut icon" href="assets/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
   <link rel="stylesheet" href="node_modules/ionicons/dist/css/ionicons.min.css">
@@ -338,7 +338,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }).fail(function (xhr, status, error) {
         console.log(status, error);
         if (error == 'Unauthorized') {
-          window.location.replace(location.href.replace(/[^/]*$/, ''));
+          var root = location.href.replace(/[^/]*$/, '');
+          var loginurl = root + 'login/?' + window.location.pathname;
+          console.log(loginurl);
+          window.location.replace(loginurl);
         }
 
         $("#state").removeClass("server-status-up").addClass("server-status-down");

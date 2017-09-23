@@ -77,25 +77,25 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <!-- Menu Toggle Button -->
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <i class="fa fa-user"></i>
-              <span id="username" class="hidden-xs"></span>
+              <span id="session-display-name" class="hidden-xs"></span>
             </a>
               <ul class="dropdown-menu">
                 <!-- The user image in the menu -->
                 <li class="user-header">
                   <i style="color: #fff; font-size:75px;" class="fa fa-user"></i>
                   <p>
-                    JP Dillingham (jp)
-                    <small>jpdillingham@gmail.com</small>
+                    <span id="session-display-name-both"></span>
+                    <small id="session-email"></small>
                   </p>
                   <p>
-                    <small><i class="fa fa-users"></i> Administrator</small>
+                    <small><i class="fa fa-users"></i> <span id="session-role"></span></small>
                   </p>
                 </li>
                 <!-- Menu Body -->
                 <!-- Menu Footer-->
                 <li class="user-footer">
                   <div class="pull-left">
-                    <a href="#" class="btn btn-default btn-flat"><i class="fa fa-pencil"></i> Profile</a>
+                    <a href="#" class="btn btn-default btn-flat" onclick="showProfile()"><i class="fa fa-pencil"></i> Profile</a>
                   </div>
                   <div class="pull-right">
                     <a href="#" class="btn btn-default btn-flat" onclick="logout()"><i class="fa fa-sign-out"></i> Log out</a>
@@ -257,6 +257,64 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Add the sidebar's background. This div must be placed
   immediately after the control sidebar -->
     <div class="control-sidebar-bg"></div>
+
+
+    <div class="modal fade" id="profile-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Edit Profile</h4>
+          </div>
+          <div class="modal-body">
+            <form role="form">
+              <div class="box-body">
+                <div id="profile-displayname-group" class="form-group">
+                  <label for="profile-displayname">Display Name</label>
+                  <input type="user" class="form-control" id="profile-displayname" placeholder="Display Name">
+                </div>
+                <div id="profile-email-group" class="form-group">
+                  <label for="profile-email">Email Address</label>
+                  <input type="email" class="form-control" id="profile-email" placeholder="Email Address">
+                </div>
+                <!-- /.box-body -->
+                <div class="form-group">
+                  <div class="checkbox">
+                    <label>
+                      <input id="password-box-toggle" type="checkbox">
+                      Change Password
+                    </label>
+                  </div>
+                </div>
+                <div id="profile-password-boxes" style="display: none;">
+                  <div id="profile-new-password-group" class="form-group">
+                    <label for="profile-new-password">New Password</label>
+                    <input type="password" class="form-control" id="profile-new-password" placeholder="New Password">
+                  </div>
+                  <div id="profile-confirm-new-password-group" class="form-group">
+                    <label for="profile-confirm-new-password">Confirm New Password</label>
+                    <input type="password" class="form-control" id="profile-confirm-new-password" placeholder="Confirm New Password">
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <div id="profile-error-text" class="alert alert-danger" style="display: none;">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><i class="fa fa-times"></i> Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="saveProfile()"><i class="fa fa-check"></i> Save</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    <div id="snackbar"></div>
   </div>
   <!-- ./wrapper -->
 
@@ -285,9 +343,43 @@ scratch. This page gets rid of all links and provides the needed markup only.
     var active;
     var hub;
     var updating = false;
+    var session;
+
+    function snackbar(msg) {
+      var x = document.getElementById("snackbar")
+
+      x.className = "show";
+      x.textContent = msg;
+
+      setTimeout(function () {
+        x.className = x.className.replace("show", "");
+      }, 3000);
+    }
 
     $(document).ready(function () {
       fetchAppInfo();
+      fetchSession();
+
+      $('#password-box-toggle').click(function () {
+        $("#profile-password-boxes").toggle(this.checked);
+        validateProfile();
+      });
+
+      $("#profile-displayname").bind("propertychange change input paste", function (event) {
+        validateProfile();
+      });
+
+      $("#profile-email").bind("propertychange change input paste", function (event) {
+        validateProfile();
+      });
+
+      $("#profile-new-password").bind("propertychange change input paste", function (event) {
+        validateProfile();
+      });
+
+      $("#profile-confirm-new-password").bind("propertychange change input paste", function (event) {
+        validateProfile();
+      });
 
       $('#dashboard').click(function () {
         navigate('dashboard', 'pages/dashboard.html');
@@ -320,8 +412,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
         navigate('demo-database', 'pages/demo-database.html');
       });
 
-      $("#username").text("JP Dillingham");
-
       active = $.cookie("Active-Page");
 
       if (active) {
@@ -330,6 +420,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
         $("#dashboard").click();
       }
     });
+
+    function fetchSession() {
+      $.get("api/v1/security/sessions/current").done(function (data) {
+        session = data;
+
+        updateSessionDisplay();
+      })
+      // todo: handle failure (force log out?)
+    }
+
+    function updateSessionDisplay() {
+      $("#session-display-name").text(session.User.DisplayName);
+      $("#session-display-name-both").text(session.User.DisplayName + " (" + session.User.Name + ")");
+      $("#session-email").text(session.User.Email);
+      $("#session-role").text(session.User.Role);
+    }
 
     function fetchAppInfo() {
       $.get("api/v1/info").done(function (data) {
@@ -412,6 +518,115 @@ scratch. This page gets rid of all links and provides the needed markup only.
           window.location.replace('');
         }
       });
+    }
+
+    function showProfile() {
+      $("#profile-displayname").val(session.User.DisplayName);
+      $("#profile-email").val(session.User.Email);
+      $("#profile-modal").modal();
+    }
+
+    function hideProfile() {
+      $("#profile-modal").modal('hide');
+    }
+
+    function validateProfile() {
+      var displayname = $("#profile-displayname").val();
+      var email = $("#profile-email").val();
+      var valid = true;
+
+      $("#profile-error-text").text('').toggle(false);
+
+      if (displayname.length == 0) {
+        $("#profile-displayname-group").addClass("has-error");
+        valid = false;
+      } else {
+        $("#profile-displayname-group").removeClass("has-error");
+      }
+
+      if (!validateEmail(email)) {
+        $("#profile-email-group").addClass("has-error");
+        valid = false;
+      } else {
+        $("#profile-email-group").removeClass("has-error");
+      }
+
+      if ($("#password-box-toggle").is(':checked')) {
+        var newpassword = $("#profile-new-password").val();
+        var confirm = $("#profile-confirm-new-password").val();
+
+        if (newpassword.length == 0) {
+          $("#profile-new-password-group").addClass("has-error");
+          valid = false;
+        } else {
+          $("#profile-new-password-group").removeClass("has-error");
+        }
+
+        if (confirm.length == 0 || confirm != newpassword) {
+          $("#profile-confirm-new-password-group").addClass("has-error");
+          valid = false;
+        } else {
+          $("#profile-confirm-new-password-group").removeClass("has-error");
+        }
+      }
+
+      return valid;
+    }
+
+    function saveProfile() {
+      if (validateProfile()) {
+        var patchdata = {
+          DisplayName: $("#profile-displayname").val(),
+          Email: $("#profile-email").val()
+        };
+
+        if ($("#password-box-toggle").is(':checked')) {
+          patchdata["Password"] = $("#profile-new-password").val();
+        }
+
+        $.ajax({
+          type: "PATCH",
+          url: 'api/v1/security/users/' + session.User.Name,
+          data: patchdata,
+          success: function (data, textStatus) {
+            session.User.DisplayName = data.DisplayName;
+            session.User.Email = data.Email;
+            updateSessionDisplay();
+            hideProfile();
+            snackbar('Profile saved successfully.');
+          },
+          error: function (xhr, ajaxOptions, thrownError) {
+            shake('profile-modal');
+            $("#profile-error-text").text(JSON.parse(xhr.responseText)).toggle(true);
+          }
+        });
+      } else {
+        shake('profile-modal');
+      }
+    }
+
+    function validateEmail(email) {
+      var re =
+        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    }
+
+    function shake(id) {
+      var div = document.getElementById(id);
+      var interval = 25;
+      var distance = 10;
+      var times = 3;
+
+      //$(div).css('position', 'relative');
+
+      for (var iter = 0; iter < (times + 1); iter++) {
+        $(div).animate({
+          left: ((iter % 2 == 0 ? distance : distance * -1))
+        }, interval);
+      }
+      $(div).animate({
+        left: 0
+      }, interval);
     }
   </script>
 </body>

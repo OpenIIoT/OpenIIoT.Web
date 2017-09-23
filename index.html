@@ -95,10 +95,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <!-- Menu Footer-->
                 <li class="user-footer">
                   <div class="pull-left">
-                    <a href="#" class="btn btn-default btn-flat">Profile</a>
+                    <a href="#" class="btn btn-default btn-flat"><i class="fa fa-pencil"></i> Profile</a>
                   </div>
                   <div class="pull-right">
-                    <a href="logout" class="btn btn-default btn-flat">Log out</a>
+                    <a href="#" class="btn btn-default btn-flat" onclick="logout()"><i class="fa fa-sign-out"></i> Log out</a>
                   </div>
                 </li>
               </ul>
@@ -402,6 +402,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
       });
 
       return pageData;
+    }
+
+    function logout() {
+      $.ajax({
+        type: "DELETE",
+        url: 'api/v1/security/sessions/current',
+        success: function (data, textStatus) {
+          window.location.replace('');
+        }
+      });
     }
   </script>
 </body>

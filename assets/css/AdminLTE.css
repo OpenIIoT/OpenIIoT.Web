@@ -610,6 +610,7 @@ a:focus {
   }
 
   .server-status {
+    color: #b8c7ce;
     font-size: 45px;
   }
 

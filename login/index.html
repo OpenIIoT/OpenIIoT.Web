@@ -1,43 +1,46 @@
 <!-- login -->
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>OpenIIoT 0.5.0 | Log in</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" href="../assets/img/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.min.css">
   <link rel="stylesheet" href="../node_modules/ionicons/dist/css/ionicons.min.css">
   <link rel="stylesheet" href="../assets/css/AdminLTE.min.css">
   <link rel="stylesheet" href="../assets/plugins/iCheck/square/blue.css">
   <link rel="stylesheet" href="../assets/css/fonts.css">
-  
+
   <!--[if lt IE 9]>
   <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 </head>
+
 <body class="hold-transition login-page">
-<div class="login-box">
-  <div class="login-logo">
+  <div class="login-box">
+    <div class="login-logo">
       <a href="../index.html">
         <img src="../assets/img/openiiot-logo-white.png" height="60">
         <span>Open<strong>IIoT</strong></span>
       </a>
-  </div>
-  <!-- /.login-logo -->
-  <div id="login-box" class="login-box-body"  style="box-shadow: 0 0 60px black;">
-    <div id="username-group" class="input-group margin-bottom-sm">
-		  <span class="input-group-addon" style="background: #f3f3f3"><i class="fa fa-user"></i></span>
-		  <input type="user" id="input-username" class="form-control" placeholder="Username">
     </div>
-	  <br/>
-    <div id="password-group" class="input-group">
-		  <span class="input-group-addon" style="background: #f3f3f3"><i class="fa fa-lock" aria-hidden="true"></i></span>
-      <input type="password" id="input-password" class="form-control" placeholder="Password">
-    </div>
-	  <br/>
+    <!-- /.login-logo -->
+    <div id="login-box" class="login-box-body" style="box-shadow: 0 0 60px black;">
+      <div id="username-group" class="input-group margin-bottom-sm">
+        <span class="input-group-addon" style="background: #f3f3f3"><i class="fa fa-user"></i></span>
+        <input type="user" id="input-username" class="form-control" placeholder="Username">
+      </div>
+      <br/>
+      <div id="password-group" class="input-group">
+        <span class="input-group-addon" style="background: #f3f3f3"><i class="fa fa-lock" aria-hidden="true"></i></span>
+        <input type="password" id="input-password" class="form-control" placeholder="Password">
+      </div>
+      <br/>
       <div class="row">
         <div class="col-xs-8">
         </div>
@@ -47,81 +50,86 @@
         </div>
         <!-- /.col -->
       </div>
+    </div>
+    <!-- /.login-box-body -->
   </div>
-  <!-- /.login-box-body -->
-</div>
-<!-- /.login-box -->
+  <!-- /.login-box -->
 
-<!-- jQuery 3 -->
-<script src="../node_modules/jquery/dist/jquery.min.js"></script>
-<script src="../node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
-<!-- Bootstrap 3.3.7 -->
-<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() {
-    $(document).keypress(function(e) {
-      if (e.which == 13) {
-        $("#start-session").click();
-      }
-    });
-
-    $("#start-session").click(function() { startSession(); });
-    
-    $("#input-password").bind("propertychange change input paste", function(event) {
-      $("#password-group").removeClass('has-error');
-    });
-
-    $("#input-username").bind("propertychange change input paste", function(event) {
-      $("#username-group").removeClass('has-error');
-    });
-
-    $("#input-username").focus();
-
-  });
-    
-  function startSession() {
-    if (validateInput()) {
-      $.ajax({
-        type: "POST",
-        url: "../api/v1/security/sessions",
-        dataType: 'json',
-        data: { "name": $('#input-username').val(), "password": $('#input-password').val() },
-        success: function(result) {
-          var destination = location.search.substr(1);
-
-          if (!destination) destination = "../";
-          window.location.replace(destination);
-        },
-        error: function(result) {
-          shake();
-          $("#password-group").addClass("has-error");
-          $('#input-password').val('').focus();
+  <!-- jQuery 3 -->
+  <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="../node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
+  <!-- Bootstrap 3.3.7 -->
+  <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $(document).keypress(function (e) {
+        if (e.which == 13) {
+          $("#start-session").click();
         }
       });
+
+      $("#start-session").click(function () {
+        startSession();
+      });
+
+      $("#input-password").bind("propertychange change input paste", function (event) {
+        $("#password-group").removeClass('has-error');
+      });
+
+      $("#input-username").bind("propertychange change input paste", function (event) {
+        $("#username-group").removeClass('has-error');
+      });
+
+      $("#input-username").focus();
+
+    });
+
+    function startSession() {
+      if (validateInput()) {
+        $.ajax({
+          type: "POST",
+          url: "../api/v1/security/sessions",
+          dataType: 'json',
+          data: {
+            "name": $('#input-username').val(),
+            "password": $('#input-password').val()
+          },
+          success: function (result) {
+            var destination = location.search.substr(1);
+
+            if (!destination) destination = "../";
+            window.location.replace(destination);
+          },
+          error: function (result) {
+            shake();
+            $("#password-group").addClass("has-error");
+            $('#input-password').val('').focus();
+          }
+        });
+      }
     }
-  }
 
-  function validateInput() {
-    var result = true;
+    function validateInput() {
+      var result = true;
 
-    if (!$("#input-username").val()) {
-      $("#username-group").addClass("has-error");
-      result = false;
+      if (!$("#input-username").val()) {
+        $("#username-group").addClass("has-error");
+        result = false;
+      }
+
+      if (!$("#input-password").val()) {
+        $("#password-group").addClass("has-error");
+        result = false;
+      }
+
+      if (!result) {
+        shake();
+      }
+
+      return result;
     }
 
-    if (!$("#input-password").val()) {
-      $("#password-group").addClass("has-error");
-      result = false;
-    } 
-
-    if (!result) {
-      shake();
-    }
-
-    return result;
-  }
-
-  function shake() {
+    function shake() {
       var div = document.getElementById('login-box');
       var interval = 25;
       var distance = 10;
@@ -129,13 +137,16 @@
 
       $(div).css('position', 'relative');
 
-      for (var iter = 0; iter < (times + 1) ; iter++) {
+      for (var iter = 0; iter < (times + 1); iter++) {
         $(div).animate({
           left: ((iter % 2 == 0 ? distance : distance * -1))
         }, interval);
-      }                                                                                                          
-      $(div).animate({ left: 0 }, interval);
-  }
-</script>
+      }
+      $(div).animate({
+        left: 0
+      }, interval);
+    }
+  </script>
 </body>
+
 </html>

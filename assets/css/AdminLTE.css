@@ -1261,7 +1261,7 @@ a:focus {
   }
   .navbar-custom-menu > .navbar-nav > li > .dropdown-menu {
     position: absolute;
-    right: 5%;
+    /*right: 5%;*/
     left: auto;
     border: 1px solid #ddd;
     background: #fff;
@@ -3285,7 +3285,7 @@ table.text-center th {
 }
 .login-page,
 .register-page {
-  background: #d2d6de;
+  background: #222d32;
 }
 .login-box,
 .register-box {

@@ -459,6 +459,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
       active = id;
       $.cookie("Active-Page", active);
 
+      if (active != 'dashboard') {
+        updating = false;
+      }
+
       // unsubscribe from any subscribed item prior to navigating.
       // this is only necessary because of the fake-SPA functionality of this page
       try {

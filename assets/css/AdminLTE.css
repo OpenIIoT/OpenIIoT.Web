@@ -10,7 +10,22 @@
  * -------------------------
  */
 
+ .server-status {
+  color: #b8c7ce;
+  font-size: 45px;
+}
+
+.server-status-up {
+  color: #00a65a;
+  -webkit-animation: fa-spin 6s infinite linear;
+  animation: fa-spin 6s infinite linear;
+}
+.server-status-down {
+  color: #f56954;
+}
+
 /* The snackbar - position it at the bottom and in the middle of the screen */
+
 #snackbar {
   visibility: hidden; /* Hidden by default. Visible on click */
   min-width: 250px; /* Set a default minimum width */
@@ -666,20 +681,6 @@ a:focus {
     padding-top: 5px;
     padding-bottom: 5px;
     border-bottom-right-radius: 4px;
-  }
-
-  .server-status {
-    color: #b8c7ce;
-    font-size: 45px;
-  }
-
-  .server-status-up {
-    color: #00a65a;
-    -webkit-animation: fa-spin 6s infinite linear;
-    animation: fa-spin 6s infinite linear;
-  }
-  .server-status-down {
-    color: #f56954;
   }
 
   .sidebar-collapse .server-status {

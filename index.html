@@ -173,12 +173,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     <!-- Main Footer -->
     <footer id="footer" class="main-footer">
-      <!-- To the right -->
-      <div class="pull-right hidden-xs">
-        Anything you want
-      </div>
-      <!-- Default to the left -->
-      <strong>Copyright &copy; 2016 <a href="#">Company</a>.</strong> All rights reserved.
+      &nbsp;
+      <span class="pull-right"><strong>Copyright &copy; 2016-2017 <a href="#">JP Dillingham</a>.</strong> All rights reserved.</span>
     </footer>
 
     <!-- Control Sidebar -->
@@ -357,6 +353,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     }
 
     $(document).ready(function () {
+      fetchAppState();
       fetchAppInfo();
       fetchSession();
 
@@ -438,10 +435,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
     }
 
     function fetchAppInfo() {
-      $.get("api/v1/info").done(function (data) {
-        $("#state").removeClass("server-status-down").addClass("server-status-up");
-        $("#instancename").text(data.InstanceName.toUpperCase());
-        $("#version").text(data.ProductName + " " + data.ProductVersion);
+      $.get("api/v1/item/read/OpenIIoT.System.InstanceName,OpenIIoT.System.ProductName,OpenIIoT.System.ProductVersion/true").done(function (data) {
+        $("#instancename").text(data[0].Value.toUpperCase());
+        $("#version").text(data[1].Value + " " + data[2].Value);
+      })
+    }
+
+    function fetchAppState() {
+      $.get("api/v1/item/read/OpenIIoT.System.State/true").done(function (data) {
+        if (data.Value == "Running") {
+          $("#state").removeClass("server-status-down").addClass("server-status-up");
+        }
+        else {
+          $("#state").removeClass("server-status-up").addClass("server-status-warn");
+        }
+
       }).fail(function (xhr, status, error) {
         console.log(status, error);
         if (error == 'Unauthorized') {
@@ -454,7 +462,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         $("#state").removeClass("server-status-up").addClass("server-status-down");
       });
 
-      setTimeout(fetchAppInfo, 5000);
+      setTimeout(fetchAppState, 5000);
     }
 
     function navigate(id, url) {
@@ -462,6 +470,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
       $("#" + id).addClass("active");
       active = id;
       $.cookie("Active-Page", active);
+
+      if (active != 'dashboard') {
+        updating = false;
+      }
 
       // unsubscribe from any subscribed item prior to navigating.
       // this is only necessary because of the fake-SPA functionality of this page

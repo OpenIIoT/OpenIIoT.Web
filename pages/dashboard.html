@@ -209,17 +209,14 @@
   var disk = [];
 
   function getCPUData() {
-    fetchLatestCPUValue();
     return makeDataSet(cpu);
   }
 
   function getMemoryData() {
-    fetchLatestMemoryValue();
     return makeDataSet(memory);
   }
 
   function getDiskData() {
-    fetchLatestDiskValue();
     return makeDataSet(disk);
   }
 
@@ -238,34 +235,22 @@
     return res
   }
 
-
-  function fetchLatestCPUValue() {
-    $.get("api/v1/item/read/OpenIIoT.System.Platform.CPU.%25%20Processor%20Time/true", function (data) {
+  function fetchGraphData() {
+    $.get("api/v1/item/read/OpenIIoT.System.Platform.CPU.%25%20Processor%20Time,OpenIIoT.System.Platform.Memory.%25%20Used,OpenIIoT.System.Platform.Drives.%25%20Disk%20Time/true", function (data) {
       if (cpu.length > 120) {
         cpu.shift();
       }
+      cpu.push(data[0].Value); 
 
-      cpu.push(data.Value);
-    });
-  }
-
-  function fetchLatestMemoryValue() {
-    $.get("api/v1/item/read/OpenIIoT.System.Platform.Memory.%25%20Used/true", function (data) {
       if (memory.length > 120) {
         memory.shift();
       }
+      memory.push(data[1].Value);  
 
-      memory.push(data.Value);
-    });
-  }
-
-  function fetchLatestDiskValue() {
-    $.get("api/v1/item/read/OpenIIoT.System.Platform.Drives.%25%20Disk%20Time/true", function (data) {
       if (disk.length > 120) {
         disk.shift();
       }
-
-      disk.push(data.Value);
+      disk.push(data[2].Value); 
     });
   }
 
@@ -346,6 +331,8 @@
 
   function update() {
     if (active == 'dashboard') {
+      fetchGraphData();
+      
       cpu_interactive_plot.setData([{
           label: "CPU",
           data: getCPUData()
@@ -359,14 +346,12 @@
           data: getDiskData()
         },
       ])
+      cpu_interactive_plot.draw()
+      window.setTimeout(update, updateInterval)
     }
-
-    cpu_interactive_plot.draw()
-    window.setTimeout(update, updateInterval)
-
   }
 
-  if (!updating) {
+  if (!updating && active == 'dashboard') {
     updating = true;
     update();
   }

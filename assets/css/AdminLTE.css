@@ -23,6 +23,11 @@
 .server-status-down {
   color: #f56954;
 }
+.server-status-warn {
+  color: #f39c12;
+  -webkit-animation: fa-spin 36s infinite linear;
+  animation: fa-spin 36s infinite linear;
+}
 
 /* The snackbar - position it at the bottom and in the middle of the screen */
 

@@ -143,6 +143,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <li class="header">DEMOS</li>
           <li id="demo-clock"><a href="#"><i class="fa fa-clock-o"></i> <span>Clock</span></a></li>
           <li id="demo-sinewave"><a href="#"><i class="fa fa-line-chart"></i> <span>Sine Wave</span></a></li>
+          <li id="demo-random"><a href="#"><i class="fa fa-line-chart"></i> <span>Random</span></a></li>
           <li id="demo-readwrite"><a href="#"><i class="fa fa-exchange"></i> <span>Read/Write</span></a></li>
           <li id="demo-mouse"><a href="#"><i class="fa fa-mouse-pointer"></i> <span>Mouse Cursor</span></a></li>
           <li id="demo-database"><a href="#"><i class="fa fa-database"></i> <span>Database</span></a></li>
@@ -172,9 +173,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- /.content-wrapper -->
 
     <!-- Main Footer -->
-    <footer id="footer" class="main-footer">
+    <footer  id="footer" class="main-footer">
       &nbsp;
-      <span class="pull-right"><strong>Copyright &copy; 2016-2017 <a href="#">JP Dillingham</a>.</strong> All rights reserved.</span>
+      <span class="pull-right"><a href="https://github.com/OpenIIoT/"><i class="fa fa-github" aria-hidden="true"></i></a> <a href="http://openiiot.org"><i class="fa fa-globe" aria-hidden="true"></i></a></span>
     </footer>
 
     <!-- Control Sidebar -->
@@ -398,6 +399,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
       });
       $('#demo-sinewave').click(function () {
         navigate('demo-sinewave', 'pages/demo-sinewave.html');
+      });
+      $('#demo-random').click(function () {
+        navigate('demo-random', 'pages/demo-random.html');
       });
       $('#demo-readwrite').click(function () {
         navigate('demo-readwrite', 'pages/demo-readwrite.html');

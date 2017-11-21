@@ -1,21 +1,77 @@
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-            <h1>
-              Security
-            </h1>
-            <ol class="breadcrumb">
-              <li><a href="#"><i class="fa fa-home"></i> Home</a></li>
-              <li><a href="#">Administration</a></li>
-              <li class="active">Security</li>
-            </ol>
-          </section>
+<!-- Content Header (Page header) -->
+<section class="content-header">
+  <h1>
+    Security
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-home"></i> Home</a></li>
+    <li><a href="#">Administration</a></li>
+    <li class="active">Security</li>
+  </ol>
+</section>
+
+<!-- Main content -->
+<section class="content container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <!-- interactive chart -->
+      <div class="box box-primary">
+        <div class="box-header">
+          <i class="fa fa-group"></i>
+
+          <h3 class="box-title">Users</h3>
+        </div>
+        <div class="box-body table-responsive">
+          <table id="users" class="table table-hover">
+            <tr>
+              <th>Username</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th style="width: 10px"></th>
+              <th style="width: 10px"></th>
+            </tr>
+            <!-- rows inserted via javascript -->
+          </table>
+          <button type="button" style="width: 200; margin-top: 30px" class="pull-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"/> New User</button>
+        </div>
+        <!-- /.box-body-->
+      </div>
+      <!-- /.box -->
       
-          <!-- Main content -->
-          <section class="content container-fluid">
-      
-            <!--------------------------
-              | Your Page Content Here |
-              -------------------------->
-      
-    </section>
-    <!-- /.content -->
+    </div>
+    <!-- /.col -->
+    
+  </div>
+  <!-- /.row -->
+</section>
+<!-- /.content -->
+
+
+<script type="text/javascript">
+  var users = [];
+
+  $(document).ready(function () {
+    fetchUsers();
+  });
+
+  function fetchUsers() {
+      $.get("api/v1/security/users").done(function (data) {
+        users = data;
+        
+        users.forEach((element) => {
+          var row = $("<tr>");
+
+            row.append($("<td>" + element.Name + "</td>"))
+            .append($("<td>" + element.DisplayName + "</td>"))
+            .append($("<td>" + element.Email + "</td>"))
+            .append($("<td>" + element.Role + "</td>"))
+            .append($("<td><i class='fa fa-pencil' aria-hidden='true'/></i>"))
+            .append($("<td><i class='fa fa-trash' aria-hidden='true'/></i>"));
+            
+            $("#users tbody").append(row);
+        })
+      })
+    }
+
+</script>

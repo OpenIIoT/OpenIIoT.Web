@@ -82,7 +82,7 @@
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="token-title"></h4>
+          <h4 class="modal-title" id="token-title">Session Token for User <strong><span id="token-user"></span></strong></h4>
         </div>
         <div class="modal-body">
           <div class="input-group">
@@ -111,12 +111,20 @@
             <h4 class="modal-title">End Session</h4>
           </div>
           <div class="modal-body">
-            <p>Are you sure you want to end the session with token beginning with <strong><span id="session-token"></span></strong> for user <strong><span id="session-user"></span></strong>?</p>
+            <p>Are you sure you want to end the session with token beginning with <strong><span id="session-token-partial"></span>...</strong> for user <strong><span id="session-user"></span></strong>?</p>
+            <input id="session-token" type="hidden"/>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-danger pull-left"><i class="fa fa-trash"></i> End Session</button>
+            <button onclick="endSession()" type="button" class="btn btn-danger pull-left"><i class="fa fa-trash"></i> End Session</button>
             <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Cancel</button>
+
+            <div id="session-token-alert" style="margin-top: 20px; margin-bottom: 0px; text-align:left; width: 100%" class="alert alert-danger alert-dismissible hidden">
+                <button type="button" class="close" onclick="endSessionAlertDismiss()" aria-hidden="true">&times;</button>
+                <h4><i class="icon fa fa-ban"></i> Error</h4>
+                <p id="session-token-errormessage"></p>
+              </div>
           </div>
+
         </div>
         <!-- /.modal-content -->
       </div>
@@ -143,6 +151,40 @@
     snackbar("Copied token to clipboard.");
   }
 
+  function endSessionAlertDismiss() {
+    $("#session-token-alert").addClass("hidden");
+  }
+  
+  function endSessionAlertShow(error) {
+    $("#session-token-errormessage").html(error);
+    $("#session-token-alert").removeClass("hidden");
+  }
+
+  function endSessionAlertShowErrorObject(error, object) {
+    var err = $("<p>");
+      err.append(object.Message + "</h3><ul>")
+      .append("<li>one</li>").append("<li>two</li>")
+        .append("</ul>");
+    $("#session-token-errormessage").html(err);
+    $("#session-token-alert").removeClass("hidden");
+  }
+
+  function endSession() {
+    var token = $("#session-token").val();
+   
+     $.ajax({
+      url: "api/v1/security/sessions/" + token,
+      type: "DELETE",
+      statusCode: {
+        204: () => {
+          snackbar("Session ended successfully");
+        },
+        404: () => { endSessionAlertShow("The specified Session could no longer be found.") },
+        500: (xhr) => { endSessionAlertShowErrorObject("An unexpected error was encountered", xhr.responseJSON); }
+      }
+    });
+  }
+
   function fetchUsers() {
     $("#users tbody:not(:first)").empty();
     $.get("api/v1/security/users").done(function (data) {
@@ -164,13 +206,14 @@
   }
 
   function showToken(user, token) {
-    $("#token-title").html("Session Token for User " + user);
+    $("#token-user").html(user);
     $("#token-body").val(token);
     $("#token-modal").modal();
   }
 
-  function endSession(user, token) {
-    $("#session-token").html(token.substring(0, 15));
+  function showEndSession(user, token) {
+    $("#session-token-partial").html(token.substring(0, 15));
+    $("#session-token").val(token);
     $("#session-user").html(user);
     $("#session-modal").modal();
   }
@@ -193,7 +236,7 @@
           .append($("<td>" + element.User.Name + "</td>"))
           .append($("<td>" + created + "</td>"))
           .append($("<td>" + expires + "</td>"))
-          .append($("<td><a href=\"javascript:endSession('" + element.User.Name + "','" + element.Token +
+          .append($("<td><a href=\"javascript:showEndSession('" + element.User.Name + "','" + element.Token +
             "')\"><i class='fa fa-trash' aria-hidden='true'/></i></a></td></tr>"));
 
         $("#sessions tbody").append(row);

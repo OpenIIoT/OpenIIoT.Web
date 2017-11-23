@@ -75,6 +75,54 @@
 
   </div>
   <!-- /session list -->
+
+  <div class="modal fade" id="token-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="token-title"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="input-group">
+            <input id="token-body" type="text" class="form-control">
+            <span class="input-group-btn">
+              <button onclick="copyToken()" type="button" class="btn btn-info btn-flat"><i class='fa fa-copy' aria-hidden='true'/></i></button>
+            </span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary pull-right" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <div class="modal fade" id="session-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">End Session</h4>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to end the session with token beginning with <strong><span id="session-token"></span></strong> for user <strong><span id="session-user"></span></strong>?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger pull-left"><i class="fa fa-trash"></i> End Session</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Cancel</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 </section>
 <!-- /.content -->
 
@@ -88,6 +136,13 @@
     fetchSessions();
   });
 
+  function copyToken() {
+    var copyText = document.getElementById("token-body");
+    copyText.select();
+    document.execCommand("Copy");
+    snackbar("Copied token to clipboard.");
+  }
+
   function fetchUsers() {
     $("#users tbody:not(:first)").empty();
     $.get("api/v1/security/users").done(function (data) {
@@ -100,12 +155,24 @@
           .append($("<td>" + element.DisplayName + "</td>"))
           .append($("<td>" + element.Email + "</td>"))
           .append($("<td>" + element.Role + "</td>"))
-          .append($("<td><i class='fa fa-pencil' aria-hidden='true'/></i>"))
-          .append($("<td><i class='fa fa-trash' aria-hidden='true'/></i>"));
+          .append($("<td><i class='fa fa-pencil' aria-hidden='true'/></i></td>"))
+          .append($("<td><i class='fa fa-trash' aria-hidden='true'/></i></td>"));
 
         $("#users tbody").append(row);
       })
     })
+  }
+
+  function showToken(user, token) {
+    $("#token-title").html("Session Token for User " + user);
+    $("#token-body").val(token);
+    $("#token-modal").modal();
+  }
+
+  function endSession(user, token) {
+    $("#session-token").html(token.substring(0, 15));
+    $("#session-user").html(user);
+    $("#session-modal").modal();
   }
 
   function fetchSessions() {
@@ -120,11 +187,14 @@
         var row = $("<tr>");
 
         row
-          .append($("<td>" + element.Token.substring(0, 25) + "... <i class='fa fa-info-circle' aria-hidden='true'/></td>"))
+          .append($("<td>" + element.Token.substring(0, 25) +
+            "... <a href=\"javascript:showToken('" + element.User.Name + "','" + element.Token +
+            "');\"><i class='fa fa-info-circle' aria-hidden='true'/></a></td>"))
           .append($("<td>" + element.User.Name + "</td>"))
           .append($("<td>" + created + "</td>"))
           .append($("<td>" + expires + "</td>"))
-          .append($("<td><i class='fa fa-trash' aria-hidden='true'/></i>"));
+          .append($("<td><a href=\"javascript:endSession('" + element.User.Name + "','" + element.Token +
+            "')\"><i class='fa fa-trash' aria-hidden='true'/></i></a></td></tr>"));
 
         $("#sessions tbody").append(row);
       })

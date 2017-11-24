@@ -108,20 +108,21 @@
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">End Session</h4>
+            <h4 class="modal-title"><i class="fa fa-trash"></i> End Session</h4>
           </div>
           <div class="modal-body">
             <p>Are you sure you want to end the session with token beginning with <strong><span id="session-token-partial"></span>...</strong> for user <strong><span id="session-user"></span></strong>?</p>
             <input id="session-token" type="hidden"/>
           </div>
           <div class="modal-footer">
-            <button onclick="endSession()" type="button" class="btn btn-danger pull-left"><i class="fa fa-trash"></i> End Session</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Cancel</button>
+            <button onclick="endSession()" type="button" class="btn btn-danger"><i class="fa fa-trash"></i> End Session</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i> Cancel</button>
 
-            <div id="session-token-alert" style="margin-top: 20px; margin-bottom: 0px; text-align:left; width: 100%" class="alert alert-danger alert-dismissible hidden">
+            <div id="session-token-alert" style="margin-top: 15px; margin-bottom: 0px; text-align:left; width: 100%" class="alert alert-danger alert-dismissible hidden">
                 <button type="button" class="close" onclick="endSessionAlertDismiss()" aria-hidden="true">&times;</button>
-                <h4><i class="icon fa fa-ban"></i> Error</h4>
-                <p id="session-token-errormessage"></p>
+                <h4><i class="icon fa fa-ban"></i><span id="session-token-alert-title"></span></h4>
+                <div id="session-token-alert-errormessage-details" style="margin-left: 25px;">
+                </div>
               </div>
           </div>
 
@@ -156,17 +157,20 @@
   }
   
   function endSessionAlertShow(error) {
-    $("#session-token-errormessage").html(error);
-    $("#session-token-alert").removeClass("hidden");
-  }
+    $("#session-token-alert-title").html(error.Message);
 
-  function endSessionAlertShowErrorObject(error, object) {
-    var err = $("<p>");
-      err.append(object.Message + "</h3><ul>")
-      .append("<li>one</li>").append("<li>two</li>")
-        .append("</ul>");
-    $("#session-token-errormessage").html(err);
+    if (error.Details.length > 0) {
+      $("#session-token-alert-errormessage-details").append("<ul>");
+      error.Details.map((detail) => {
+        $("#session-token-alert-errormessage-details").append("<li> " + detail + "</li>");
+      });
+
+      $("#session-token-alert-errormessage-details").append("</ul>");
+    }
+
+
     $("#session-token-alert").removeClass("hidden");
+    shake('session-modal');
   }
 
   function endSession() {
@@ -177,10 +181,12 @@
       type: "DELETE",
       statusCode: {
         204: () => {
+          $('#session-modal').modal('hide');
           snackbar("Session ended successfully");
+          fetchSessions();
         },
-        404: () => { endSessionAlertShow("The specified Session could no longer be found.") },
-        500: (xhr) => { endSessionAlertShowErrorObject("An unexpected error was encountered", xhr.responseJSON); }
+        404: () => { endSessionAlertShow({ Message: "Session not found" }) },
+        500: (xhr) => { endSessionAlertShow(xhr.responseJSON); }
       }
     });
   }
@@ -243,4 +249,22 @@
       })
     })
   }
+
+  function shake(id) {
+      var div = document.getElementById(id);
+      var interval = 25;
+      var distance = 10;
+      var times = 3;
+
+      //$(div).css('position', 'relative');
+
+      for (var iter = 0; iter < (times + 1); iter++) {
+        $(div).animate({
+          left: ((iter % 2 == 0 ? distance : distance * -1))
+        }, interval);
+      }
+      $(div).animate({
+        left: 0
+      }, interval);
+    }
 </script>

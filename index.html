@@ -131,10 +131,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </div>
           <li class="header">ADMINISTRATION</li>
           <li id="dashboard"><a href="#"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
-          <!--
-          <li id="configuration"><a href="#"><i class="fa fa-wrench"></i> <span>Configuration</span></a></li>
           <li id="security"><a href="#"><i class="fa fa-lock"></i> <span>Security</span></a></li>
           <li id="packages"><a href="#"><i class="fa fa-archive"></i> <span>Packages</span></a></li>
+          <!--
+          <li id="configuration"><a href="#"><i class="fa fa-wrench"></i> <span>Configuration</span></a></li>
           -->
 
           <li class="header">HELP</li>
@@ -499,31 +499,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
       $.get(url, function (response, status, jqXHR) {
         if (response.substring(0, 14) == "<!-- login -->") {
-          window.location.replace(location.href.replace(/[^/]*$/, ''));
+          location.reload();
         } else {
-
           $("#content").html(response);
         }
       });
-    }
-
-    function getPage(url) {
-      var pageData;
-      $.ajax({
-        type: "GET",
-        url: url,
-        success: function (data, textStatus) {
-          if (data.redirect) {
-            // data.redirect contains the string URL to redirect to
-            window.location.replace(data.redirect);
-          } else {
-            // data.form contains the HTML for the replacement form
-            pageData = data;
-          }
-        }
-      });
-
-      return pageData;
     }
 
     function logout() {

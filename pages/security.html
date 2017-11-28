@@ -1,21 +1,447 @@
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-            <h1>
-              Security
-            </h1>
-            <ol class="breadcrumb">
-              <li><a href="#"><i class="fa fa-home"></i> Home</a></li>
-              <li><a href="#">Administration</a></li>
-              <li class="active">Security</li>
-            </ol>
-          </section>
-      
-          <!-- Main content -->
-          <section class="content container-fluid">
-      
-            <!--------------------------
-              | Your Page Content Here |
-              -------------------------->
-      
-    </section>
-    <!-- /.content -->
+<!-- Content Header (Page header) -->
+<section class="content-header">
+  <h1>
+    Security
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-home"></i> Home</a></li>
+    <li><a href="#">Administration</a></li>
+    <li class="active">Security</li>
+  </ol>
+</section>
+
+<!-- Main content -->
+<section class="content container-fluid">
+  <!-- users list -->
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box box-primary">
+        <div class="box-header">
+          <i class="fa fa-group"></i>
+
+          <h3 class="box-title">Users</h3>
+        </div>
+        <div class="box-body table-responsive">
+          <table id="users" class="table table-hover">
+            <tr>
+              <th>Username</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th style="width: 10px"></th>
+              <th style="width: 10px"></th>
+            </tr>
+            <!-- rows inserted via javascript -->
+          </table>
+          <button id="addUser" type="button" style="width: 200; margin-top: 30px" class="pull-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"/> New User</button>
+        </div>
+        <!-- /.box-body-->
+      </div>
+      <!-- /.box -->
+
+    </div>
+    <!-- /.col -->
+
+  </div>
+  <!-- /users list -->
+
+  <!-- session list -->
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box">
+        <div class="box-header">
+          <i class="fa fa-id-card"></i>
+
+          <h3 class="box-title">Active Sessions</h3>
+        </div>
+        <div class="box-body table-responsive">
+          <table id="sessions" class="table table-hover">
+            <tr>
+              <th>Token</th>
+              <th>Username</th>
+              <th>Created</th>
+              <th>Expires</th>
+              <th style="width: 10px"></th>
+            </tr>
+            <!-- rows inserted via javascript -->
+          </table>
+        </div>
+        <!-- /.box-body-->
+      </div>
+      <!-- /.box -->
+
+    </div>
+    <!-- /.col -->
+
+  </div>
+  <!-- /session list -->
+
+  <div class="modal fade" id="token-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="token-title"><i class='fa fa-info-circle' aria-hidden='true' /> Session Token</h4>
+        </div>
+        <div class="modal-body">
+          <p>For User <strong><span id="token-user"></span></strong></p>
+
+          <div class="input-group">
+            <input id="token-body" type="text" class="form-control">
+            <span class="input-group-btn">
+              <button onclick="copyToken()" type="button" class="btn btn-info btn-flat"><i class='fa fa-copy' aria-hidden='true'/></i></button>
+            </span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary pull-right" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <div class="modal fade" id="session-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title"><i class="fa fa-trash"></i> End Session</h4>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to end the session with token beginning with <strong><span id="session-token-partial"></span>...</strong>            for user <strong><span id="session-user"></span></strong>?</p>
+          <input id="session-token" type="hidden" />
+        </div>
+        <div class="modal-footer">
+          <button onclick="endSession()" type="button" class="btn btn-danger"><i class="fa fa-trash"></i> End Session</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i> Cancel</button>
+
+          <div id="session-token-alert" style="margin-top: 15px; margin-bottom: 0px; text-align:left; width: 100%" class="alert alert-danger alert-dismissible hidden">
+            <button type="button" class="close" onclick="endSessionAlertDismiss()" aria-hidden="true">&times;</button>
+            <h4><i class="icon fa fa-ban"></i><span id="session-token-alert-title"></span></h4>
+            <div id="session-token-alert-errormessage-details" style="margin-left: 25px;">
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <div class="modal fade" id="user-edit-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title"><i class="fa fa-pencil"></i> Edit User</h4>
+        </div>
+        <div class="modal-body">
+          <form role="form">
+            <div class="box-body">
+              <div id="user-edit-username-group" class="form-group">
+                <label for="user-edit-displayname">Username</label>
+                <input type="user" class="form-control" id="user-edit-username" placeholder="Username" disabled>
+              </div>
+              <div id="user-edit-displayname-group" class="form-group">
+                <label for="puser-edit-displayname">Display Name</label>
+                <input type="user" class="form-control" id="user-edit-displayname" placeholder="Display Name">
+              </div>
+              <div id="user-edit-email-group" class="form-group">
+                <label for="user-edit-email">Email Address</label>
+                <input type="email" class="form-control" id="user-edit-email" placeholder="Email Address">
+              </div>
+              <div id="user-edit-role-group" class="form-group">
+                <label for="user-edit-role">Role</label>
+                <select class="form-control" id="user-edit-role">
+                </select>
+              </div>
+              <!-- /.box-body -->
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button onclick="saveUser(); userEditAlertDismiss()" type="button" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
+          <button onclick="userEditAlertDismiss()" type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i> Cancel</button>
+
+          <div id="user-edit-alert" style="margin-top: 15px; margin-bottom: 0px; text-align:left; width: 100%" class="alert alert-danger alert-dismissible hidden">
+            <button type="button" class="close" onclick="userEditAlertDismiss()" aria-hidden="true">&times;</button>
+            <h4><i class="icon fa fa-ban"></i><span id="user-edit-alert-title"></span></h4>
+            <div id="user-edit-alert-errormessage-details" style="margin-left: 25px;">
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+    <script type="text/javascript">
+      function editUser(username) {
+        $("#user-edit-role").empty();
+        roles.map(x => $("#user-edit-role").append("<option>" + x + "</option>"));
+
+        fetchUser(username);
+        $("#user-edit-modal").modal();
+      }
+
+      function fetchUser(username) {
+        $.ajax({
+          url: "api/v1/security/users/" + username,
+          type: "GET",
+          statusCode: {
+            200: (user) => {
+              $("#user-edit-username").val(user.Name);
+              $("#user-edit-displayname").val(user.DisplayName);
+              $("#user-edit-email").val(user.Email);
+              $("#user-edit-role option:contains(" + user.Role + ")").prop('selected', true);
+            }
+          }
+        });
+      }
+
+      function saveUser() {
+        var userData = {};
+        userData.DisplayName = $("#user-edit-displayname").val();
+        userData.Email = $("#user-edit-email").val();
+        userData.Role = $("#user-edit-role").val();
+
+        console.log(userData);
+        console.log(JSON.stringify(userData));
+
+        var username = $("#user-edit-username").val();
+
+        $.ajax({
+          url: "api/v1/security/users/" + username,
+          type: "PATCH",
+          data: userData,
+          statusCode: {
+            200: () => {
+              $('#user-edit-modal').modal('hide');
+              snackbar("User " + username + " updated successfully.");
+              fetchUsers();
+            },
+            400: (xhr) => {
+              userEditAlertShow(xhr.responseJSON);
+            },
+            401: (xhr) => {
+              console.log(xhr);
+              userEditAlertShow({
+                Message: "test"
+              })
+            },
+            404: (xhr) => (userEditAlertShow({
+              Message: "The User does not exist."
+            })),
+            500: (xhr) => {
+              userEditAlertShow(xhr.responseJSON);
+            }
+          }
+        });
+      }
+
+      function userEditAlertDismiss() {
+        $("#user-edit-alert").addClass("hidden");
+      }
+
+      function userEditAlertShow(error) {
+        $("#user-edit-alert-title").html(error.Message);
+        $("#user-edit-alert-errormessage-details").empty();
+
+        if (error.hasOwnProperty("Details")) {
+          if (error.Details.length > 0) {
+            errorhtml = "<ul>";
+            error.Details.map((detail) => {
+              errorhtml += "<li> " + detail + "</li>";
+            });
+            errorhtml += "</ul>";
+            $("#user-edit-alert-errormessage-details").append(errorhtml);
+          }
+        } else if (error.hasOwnProperty("Model")) {
+          if (error.Model.length > 0) {
+            var modelhtml = '<ul>';
+            error.Model.map((model) => {
+              modelhtml += "<li>" + model.Field + "</li>";
+
+              if (model.Messages.length > 0) {
+                modelhtml += "<ul>";
+                model.Messages.map((message => {
+                  modelhtml += "<li>" + message + "</li>";
+                }))
+                modelhtml += "</ul>";
+              }
+            });
+
+            $("#user-edit-alert-errormessage-details").append(modelhtml);
+          }
+        }
+
+
+        $("#user-edit-alert").removeClass("hidden");
+        shake('user-edit-modal');
+      }
+    </script>
+  </div>
+  <!-- /.modal -->
+</section>
+<!-- /.content -->
+
+
+<script type="text/javascript">
+  var users = [];
+  var sessions = [];
+  var roles = [];
+
+  $("#addUser").click(() => {
+    $("#user-add-modal").modal();
+  });
+
+  $(document).ready(function () {
+    fetchUsers();
+    fetchSessions();
+    fetchRoles();
+  });
+
+  function fetchRoles() {
+    $.get("api/v1/security/roles").done((data) => {
+      roles = data;
+    });
+  }
+
+  function copyToken() {
+    var copyText = document.getElementById("token-body");
+    copyText.select();
+    document.execCommand("Copy");
+    snackbar("Copied token to clipboard.");
+  }
+
+  function endSessionAlertDismiss() {
+    $("#session-token-alert").addClass("hidden");
+  }
+
+  function endSessionAlertShow(error) {
+    $("#session-token-alert-title").html(error.Message);
+
+    if (error.Details.length > 0) {
+      $("#session-token-alert-errormessage-details").append("<ul>");
+      error.Details.map((detail) => {
+        $("#session-token-alert-errormessage-details").append("<li> " + detail + "</li>");
+      });
+
+      $("#session-token-alert-errormessage-details").append("</ul>");
+    }
+
+
+    $("#session-token-alert").removeClass("hidden");
+    shake('session-modal');
+  }
+
+  function endSession() {
+    var token = $("#session-token").val();
+
+    $.ajax({
+      url: "api/v1/security/sessions/" + token,
+      type: "DELETE",
+      statusCode: {
+        204: () => {
+          $('#session-modal').modal('hide');
+          snackbar("Session ended successfully");
+          fetchSessions();
+        },
+        404: () => {
+          endSessionAlertShow({
+            Message: "Session not found"
+          })
+        },
+        500: (xhr) => {
+          endSessionAlertShow(xhr.responseJSON);
+        }
+      }
+    });
+  }
+
+  function fetchUsers() {
+    $("#users").find("tr:gt(0)").remove()
+    $.get("api/v1/security/users").done(function (data) {
+      users = data;
+
+      users.forEach((element) => {
+        var row = $("<tr>");
+
+        row.append($("<td>" + element.Name + "</td>"))
+          .append($("<td>" + element.DisplayName + "</td>"))
+          .append($("<td>" + element.Email + "</td>"))
+          .append($("<td>" + element.Role + "</td>"))
+          .append($("<td><a href=\"javascript:editUser('" + element.Name +
+            "')\"><i class='fa fa-pencil' aria-hidden='true'/></i></a></td>"))
+          .append($("<td><i class='fa fa-trash' aria-hidden='true'/></i></td>"));
+
+        $("#users tbody").append(row);
+      })
+    })
+  }
+
+  function showToken(user, token) {
+    $("#token-user").html(user);
+    $("#token-body").val(token);
+    $("#token-modal").modal();
+  }
+
+  function showEndSession(user, token) {
+    $("#session-token-partial").html(token.substring(0, 15));
+    $("#session-token").val(token);
+    $("#session-user").html(user);
+    $("#session-modal").modal();
+  }
+
+  function fetchSessions() {
+    $("#sessions tbody:not(:first)").empty();
+
+    $.get("api/v1/security/sessions").done(function (data) {
+      sessions = data;
+
+      sessions.forEach((element) => {
+        var created = new Date(parseInt(element.Created.substr(6))).toTimeString().split(' ')[0];
+        var expires = new Date(parseInt(element.Expires.substr(6))).toTimeString().split(' ')[0];
+        var row = $("<tr>");
+
+        row
+          .append($("<td>" + element.Token.substring(0, 25) +
+            "... <a href=\"javascript:showToken('" + element.User.Name + "','" + element.Token +
+            "');\"><i class='fa fa-info-circle' aria-hidden='true'/></a></td>"))
+          .append($("<td>" + element.User.Name + "</td>"))
+          .append($("<td>" + created + "</td>"))
+          .append($("<td>" + expires + "</td>"))
+          .append($("<td><a href=\"javascript:showEndSession('" + element.User.Name + "','" + element.Token +
+            "')\"><i class='fa fa-trash' aria-hidden='true'/></i></a></td></tr>"));
+
+        $("#sessions tbody").append(row);
+      })
+    })
+  }
+
+  function shake(id) {
+    var div = document.getElementById(id);
+    var interval = 25;
+    var distance = 10;
+    var times = 3;
+
+    //$(div).css('position', 'relative');
+
+    for (var iter = 0; iter < (times + 1); iter++) {
+      $(div).animate({
+        left: ((iter % 2 == 0 ? distance : distance * -1))
+      }, interval);
+    }
+    $(div).animate({
+      left: 0
+    }, interval);
+  }
+</script>

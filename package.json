@@ -32,6 +32,7 @@
     "less": "^2.7.2"
   },
   "dependencies": {
+    "babel-standalone": "^6.26.0",
     "bootstrap": "^3.3.7",
     "bootstrap-colorpicker": "^2.5.1",
     "bootstrap-datepicker": "^1.7.0",
@@ -61,6 +62,8 @@
     "morris.js": "^0.5.0",
     "pace": "0.0.4",
     "raphael": "^2.2.7",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
     "requirejs": "^2.3.5",
     "select2": "^4.0.3",
     "signalr": "^2.2.2"
